@@ -43,6 +43,7 @@ headers = {
     'host': 'www.sec.gov'
 }
 
+
 feature_dict = dict()
 
 def get_data(cik, type, datea, dateb):
@@ -82,9 +83,8 @@ def get_data(cik, type, datea, dateb):
 
 
 def get_sheet(cik, form, datea, dateb):
-    try:
         list_tables = get_data(cik, form, datea, dateb)
-
+        
         for table in list_tables:
 
             content = requests.get(table["url"], headers=headers).content
@@ -92,36 +92,37 @@ def get_sheet(cik, form, datea, dateb):
             trs = bs_table.table.find_all('tr')
 
             for tr in trs:
-                tr_text = tr.text.upper()
-
+                tr_text = tr.text.lower()
+                
                 for feature in features:
                     
-                    feature = feature.upper()
-                    featureWords = feature.split(" ")
+                    try:
+                        feature = feature.lower()
+                        featureWords = feature.split(" ")
 
-                    flag = True
-                    for word in featureWords:
-                        if word not in tr_text:
-                            flag = False
-                            break
-                    if flag==True:
-                        tds = tr.find_all('td')
-                        val_list = []
-                        for td in tds[1:]:
-                            if len(td.text) < 20:
-                                td_text = td.text.replace(",","")
+                        flag = True
+                        for word in featureWords:
+                            if word not in tr_text:
+                                flag = False
+                                break
+                        if flag==True:
+                            tds = tr.find_all('td')
+                            val_list = []
+                            if len(tds[1].text) < 20:
+                                td_text = tds[1].text.replace(",","")
                                 match_str = re.findall('([0-9\.\(\)]+)',td_text)
                                 if len(match_str) != 0:
                                     val_list.append(match_str[0])
-                        feature_dict[tds[0].text]=val_list
+                            if len(val_list)>0:
+                                feature_dict[tds[0].text+" table = "+table['name_short']]=val_list
 
+                    except:
+                        continue
                     
                 
         df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
         return df
-                        
-    except Exception as e:
-        return NULL
+    
 
 
 # get_sheet(1459417,"10-K","20210101", "20220101")

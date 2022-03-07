@@ -9,7 +9,7 @@ ciks = companies["CIK"].astype(int).tolist()
 for cik in ciks:
     try:
         df = scrape_table.get_sheet(cik,"10-K","20200101", "20210101")
-        df.to_csv("./results/{}.csv".format(str(cik)+" 10-K"),index=False)
+        df.to_csv("./temp/{}.csv".format(str(cik)+" 10-K"),index=False)
     except:
         continue
 
