@@ -1,4 +1,5 @@
 # A better way of getting all the records in Pandas DataFrame
+from asyncio.windows_events import NULL
 from enum import Flag
 import requests
 import xml.etree.ElementTree as ET
@@ -59,6 +60,7 @@ def get_data(cik, type, datea, dateb):
     response = requests.get(url=endpoint, params=param, headers=headers)
     tree = ET.ElementTree(ET.fromstring(response.text))
     root = tree.getroot()
+    master_reports = []
     for child in root.findall("{http://www.w3.org/2005/Atom}entry"):
         accn = (child.find("{http://www.w3.org/2005/Atom}content")
                 ).find("{http://www.w3.org/2005/Atom}accession-number").text
@@ -68,7 +70,7 @@ def get_data(cik, type, datea, dateb):
         soup = BeautifulSoup(content, 'lxml')
 
         reports = soup.find('myreports')
-        master_reports = []
+        
 
         for report in reports.find_all('report')[:-1]:
             report_dict = {}
@@ -81,18 +83,24 @@ def get_data(cik, type, datea, dateb):
 
 def get_sheet(cik, form, datea, dateb):
     try:
-        list_table = get_data(cik, form, datea, dateb)
-        for i in list_table:
-            content = requests.get(i["url"], headers=headers).content
+        list_tables = get_data(cik, form, datea, dateb)
+
+        for table in list_tables:
+
+            content = requests.get(table["url"], headers=headers).content
             bs_table = BeautifulSoup(content, features='lxml')
             trs = bs_table.table.find_all('tr')
+
             for tr in trs:
+                tr_text = tr.text.upper()
+
                 for feature in features:
+                    
                     feature = feature.upper()
-                    words = feature.split(" ")
-                    tr_text = tr.text.upper()
+                    featureWords = feature.split(" ")
+
                     flag = True
-                    for word in words:
+                    for word in featureWords:
                         if word not in tr_text:
                             flag = False
                             break
@@ -106,10 +114,15 @@ def get_sheet(cik, form, datea, dateb):
                                 if len(match_str) != 0:
                                     val_list.append(match_str[0])
                         feature_dict[tds[0].text]=val_list
+
+                    
+                
+        df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
+        return df
                         
     except Exception as e:
-        print(e)
+        return NULL
 
 
-get_sheet(1459417,"10-K","20210101", "20220101")
-print(feature_dict)
+# get_sheet(1459417,"10-K","20210101", "20220101")
+# print(feature_dict)

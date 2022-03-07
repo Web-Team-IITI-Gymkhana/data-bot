@@ -1,0 +1,97 @@
+Feature,Values
+Cash and cash equivalents,"['409949', '89974']"
+Total current assets,"['971985', '461813']"
+"Property and equipment, net","['20296', '11729']"
+Goodwill,"['36910', '9494']"
+Total assets,"['1342338', '618167']"
+Total current liabilities,"['246830', '124580']"
+Total stockholders’ equity,"['424907', '301818']"
+Total liabilities and stockholders’ equity,"['1342338', '618167']"
+Net loss,"['(68302)', '(67300)']"
+"Net loss per share, basic and diluted (in dollars per share)","['(3.83)', '(0.69)', '(0.60)']"
+Total stockholders' equity,"['10530155', '9362114']"
+Total liabilities and stockholders' equity,"['20762400', '18768682']"
+"Impairment of goodwill, intangible assets and equipment","['0', '0', '9469']"
+Total operating expenses,"['340778', '201000', '128003']"
+"Other income (expense), net","['10434', '3042', '(205)']"
+Net loss per share:,[]
+"Other comprehensive income (loss), net of tax",[]
+Marketable securities,"['84180', '87754']"
+Gross profit,"['378759', '230770', '109804']"
+"Interest and other income, net","['919', '1273', '989']"
+"Total non-operating income (expense), net","['(63380)', '(46493)', '(30454)']"
+Weighted-average shares used in computing net loss per share:,[]
+"Other comprehensive loss, net of tax:",[]
+Unrealized gain (loss) on marketable securities,"['395', '(21)', '(78)']"
+"Deferred income taxes, net","['32053', '31715']"
+TOTAL ASSETS,"['743145', '487197']"
+TOTAL LIABILITIES AND STOCKHOLDERS’ EQUITY,"['3257534', '2122455']"
+Revenues,[]
+Total revenues,"['19937', '17253', '20656', '21109', '18268', '17669', '20792', '20325', '78955', '77054', '83424']"
+Net income,"['53330', '21524', '29251']"
+"Interest and other income (expense), net","['42255', '39536', '36395']"
+"Investment gains (losses), net","['51579', '3213', '7553']"
+Basic net income per share,"['6.07', '5.28', '3.43']"
+Shares used to compute basic net income per share,"['486291', '490564', '493632']"
+Diluted net income per share,"['6.00', '5.20', '3.38']"
+Shares used to compute diluted net income per share,"['491572', '497843', '501123']"
+"Other comprehensive income (loss), net of taxes","['(39904)', '(36309)', '61781']"
+"Total comprehensive income, net of taxes","['2911554', '2554465', '1755735']"
+"
+
+[1]
+Reclassification adjustments for gains / losses on available-for-sale securities are classified in interest and other income (expense), net. 
+
+
+[2]
+Reclassification adjustments for gains / losses on foreign currency hedges are classified in revenue and reclassification adjustments for gains / losses on Treasury lock hedges are classified in interest expense.
+
+","['1', '2']"
+[1],[]
+Total Current Assets,"['6241', '17583']"
+Total Non-Current Assets,"['28687', '43390']"
+Total Assets,"['34928', '60973']"
+Total Current Liabilities,"['238622', '265367']"
+Net Loss,"['(68302)', '(67300)']"
+Adjustments to reconcile net loss to net cash used in operating activities:,[]
+"Cash and Cash Equivalents, at Carrying Value, Beginning Balance","['17583', '7257']"
+"Cash and Cash Equivalents, at Carrying Value, Ending Balance","['6241', '17583']"
+"Net Income (Loss), Including Portion Attributable to Noncontrolling Interest","['(68302)', '(67300)']"
+Note 1. Nature of Operations,[]
+Note 2. Significant Accounting Policies,[]
+Note 4. Related Party Transactions,[]
+Going Concern,[]
+Use of Estimates,[]
+"Other income, net","['6535', '143', '35']"
+Net loss attributable to redeemable noncontrolling interest,"['201', '0', '0']"
+Net income allocated to participating securities,"['0', '(3)', '(13)']"
+Net income attributable to parent,"['53531', '21524', '29251']"
+Net income attributable to common stockholders,"['21521', '29238']"
+Net income per share:,[]
+"Total liabilities, redeemable noncontrolling interest and stockholders’ equity","['557799', '440985']"
+Adjustments to reconcile net income to net cash from operating activities:,[]
+Disposal of property and equipment,"['0', '1410', '828']"
+Additions to property and equipment,"['(19324)', '(11015)', '(10464)']"
+Net (decrease) / increase in cash and cash equivalents,"['(26432)', '49732', '(44305)']"
+Cash and cash equivalents at beginning of the period,"['146061', '96329', '140634']"
+Cash and cash equivalents at end of the period,"['119629', '146061', '96329']"
+"Cash paid for / (received from) income taxes, net of refunds","['2254', '(2052)', '1805']"
+TOTAL STOCKHOLDERS’ EQUITY,"['354707', '293686']"
+"TOTAL LIABILITIES, MEZZANINE EQUITY AND STOCKHOLDERS’ EQUITY","['743145', '487197']"
+"Other (income) expense, net","['(1552)', '(2580)', '994']"
+Net (loss) income,"['(7542)', '15535', '(101941)', '1']"
+"Net (loss) income per share attributable to common stockholders, basic","['(0.11)', '0.23', '(1.94)']"
+"Net (loss) income per share attributable to common stockholders, diluted","['(0.11)', '0.21', '(1.94)']"
+"Weighted average number of shares used in computing net (loss) income per share, basic","['71544', '67468', '52466']"
+"Weighted average number of shares used in computing net (loss) income per share, diluted","['71544', '74878', '52466']"
+"Other comprehensive (loss) income, net of tax:",[]
+Net income (loss),"['27143', '28020', '(17499)']"
+Net income (loss) attributable to common stockholders,"['27143', '28020', '(19482)']"
+"Net Income (loss) per share attributable to common stockholders, basic (in dollars per share)","['0.43', '0.46', '(0.37)']"
+"Net income (loss) per share attributable to common stockholders, diluted (in dollars per share)","['0.40', '0.43', '(0.37)']"
+"Weighted-average shares used to compute net income (loss) per share attributable to common stockholders, basic (in shares)","['63424', '60829', '53006']"
+"Weighted-average shares used to compute net income (loss) per share attributable to common stockholders, diluted (in shares)","['68661', '64744', '53006']"
+"Other comprehensive income (loss), net of tax:",[]
+"Net unrealized holding gain (loss) on investments, net of tax","['714', '(22)', '(217)']"
+"Other comprehensive loss, net of tax","['(955)', '(217)', '(345)']"
+"Deferred income tax, net","['5594', '11647']"
