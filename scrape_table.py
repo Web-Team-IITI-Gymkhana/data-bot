@@ -122,8 +122,6 @@ def get_sheet(cik, form, datea, dateb):
                 
         df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
         return df
-    
-
 
 # get_sheet(1459417,"10-K","20210101", "20220101")
 # print(feature_dict)
