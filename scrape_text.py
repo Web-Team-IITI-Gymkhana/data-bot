@@ -18,9 +18,9 @@ def scrape_text(cik, form, datea, dateb):
     base_url = "https://www.sec.gov/Archives/edgar/data/"
     param = {'action': 'getcompany',
             'CIK': cik,
-            'type': "10-K",
-            'dateb': "20220101",
-            'datea': "20210101",
+            'type': type,
+            'dateb': dateb,
+            'datea': datea,
             'owner': 'exclude',
             'output': 'atom',
             'count': '100',
