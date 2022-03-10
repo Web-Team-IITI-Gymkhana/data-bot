@@ -1,6 +1,4 @@
 # A better way of getting all the records in Pandas DataFrame
-from asyncio.windows_events import NULL
-from enum import Flag
 import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
@@ -43,9 +41,6 @@ headers = {
     'host': 'www.sec.gov'
 }
 
-
-feature_dict = dict()
-
 def get_data(cik, type, datea, dateb):
     endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"
     base_url = "https://www.sec.gov/Archives/edgar/data/"
@@ -83,45 +78,53 @@ def get_data(cik, type, datea, dateb):
 
 
 def get_sheet(cik, form, datea, dateb):
-        list_tables = get_data(cik, form, datea, dateb)
-        
-        for table in list_tables:
+    feature_dict = dict()
+    list_tables = get_data(cik, form, datea, dateb)
+    
+    for table in list_tables:
 
-            content = requests.get(table["url"], headers=headers).content
-            bs_table = BeautifulSoup(content, features='lxml')
-            trs = bs_table.table.find_all('tr')
-
-            for tr in trs:
-                tr_text = tr.text.lower()
+        content = requests.get(table["url"], headers=headers).content
+        bs_table = BeautifulSoup(content, features='lxml')
+        trs = bs_table.table.find_all('tr')
+        multiplier = 1
+        for tr in trs:
+            tr_text = tr.text.lower()
+            if "million" in tr_text:
+                multiplier = 1000000
+            elif "billion" in tr_text:
+                multiplier = 1000000000
+            elif "thousand" in tr_text:
+                multiplier = 1000
+            elif "hundred" in tr_text:
+                multiplier = 100
+            for feature in features:
                 
-                for feature in features:
-                    
-                    try:
-                        feature = feature.lower()
-                        featureWords = feature.split(" ")
+                try:
+                    feature = feature.lower()
+                    featureWords = feature.split(" ")
 
-                        flag = True
-                        for word in featureWords:
-                            if word not in tr_text:
-                                flag = False
-                                break
-                        if flag==True:
-                            tds = tr.find_all('td')
-                            val_list = []
-                            if len(tds[1].text) < 20:
-                                td_text = tds[1].text.replace(",","")
-                                match_str = re.findall('([0-9\.\(\)]+)',td_text)
-                                if len(match_str) != 0:
-                                    val_list.append(match_str[0])
-                            if len(val_list)>0:
-                                feature_dict[tds[0].text+" table = "+table['name_short']]=val_list
+                    flag = True
+                    for word in featureWords:
+                        if word not in tr_text:
+                            flag = False
+                            break
+                    if flag==True:
+                        tds = tr.find_all('td')
+                        val_list = []
+                        if len(tds[1].text) < 20:
+                            td_text = tds[1].text.replace(",","")
+                            match_str = re.findall('([0-9\.\(\)]+)',td_text)
+                            if len(match_str) != 0:
+                                val_list.append(match_str[0])
+                        if len(val_list)>0:
+                            feature_dict[tds[0].text+" table = "+table['name_short']]=float(val_list[0])*multiplier
 
-                    except:
-                        continue
-                    
+                except:
+                    continue
                 
-        df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
-        return df
+            
+    df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
+    return df
 
-# get_sheet(1459417,"10-K","20210101", "20220101")
+#print(get_sheet(1459417,"10-K","20210101", "20220101"))
 # print(feature_dict)
