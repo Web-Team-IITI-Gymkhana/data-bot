@@ -37,7 +37,7 @@ def scrape_text(cik, form, datea, dateb):
         content = requests.get(xml_summary, headers=headers).content
         soup = BeautifulSoup(content, features='lxml')
         reports = soup.find('inputfiles')
-        file_name = (reports.find_all("file", attrs={"doctype": "10-K"})[0]).text
+        file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
         doc_url = gen_url + file_name
         http = urllib3.PoolManager()
         req = http.request("GET",doc_url,headers=headers)
@@ -57,14 +57,12 @@ def scrape_text(cik, form, datea, dateb):
                             if feature in i:
                                 match = re.findall('\$([0-9\.]*)\s(billion|million|thousand|hundred)', i)
                                 if len(match)>0:
-            #                         print(match[0][0], "\n")
                                     value.append(f'{match[0][0]} {match[0][1]}')
                     else:
                         for i in lines:
                             if feature in i:
                                 match = re.findall('\$([0-9\.]*)\s(billion|million|thousand|hundred)', i)
                                 if len(match)>0:
-            #                         print(match[0][0])
                                     value.append(f'{match[0][0]} {match[0][1]}')
 
             for figure in value:

@@ -1,14 +1,22 @@
-# A better way of getting all the records in Pandas DataFrame
 import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
-features = [
+
+mod_features = [
     "Cash equivalents",
     "Marketable securities",
     "Inventories",
+    "Common stock",
+    "shares outstanding",
+    "Total Stockholders Equity",
+    "Stock Price",
+    "Total costs expenses",
+    "Sales Cost",
+    "Marketing Cost",
+    "Subscription Revenue",
     "Property equipment",
     "Gross property equipment",
     "Total current assets",
@@ -30,11 +38,52 @@ features = [
     "net operating expenses",
     "cost of sales",
     "subscriber churn",
-    "churn",
     "GAAP Revenue",
     "EBITDA",
-    "Non-GAAP Earnings"
+    "Non-GAAP Earnings",
+    "Recurring Revenue",
+    "operating income",
 ]
+
+mod_to_orig = {
+    'Cash equivalents': 'Cash and Cash equivalents', 
+    'Marketable securities': 'Marketable securities', 
+    'Inventories': 'Inventories',
+    'Common stock' : 'Common stock',
+    'shares outstanding':'shares outstanding',
+    'Total Stockholders Equity':'Total Stockholders Equity',
+    'Stock Price':'Stock Price',
+    'Total costs expenses':'Total costs and expenses',
+    'Sales Cost':'Sales Cost', 
+    'Marketing Cost' : 'Marketing Cost',
+    'Subscription Revenue' : 'Subscription Revenue',
+    'Property equipment': 'Property and equipment net', 
+    'Gross property equipment': 'Gross property and equipment', 
+    'Total current assets': 'Total current assets', 
+    'Total assets': 'Total assets', 
+    'Total current liabilities': 'Total current liabilities', 
+    'Total equity': 'Total equity', 
+    'Total debt': 'Total debt', 
+    'total operating expenses': 'total operating expenses', 
+    'customer acquisition costs': 'customer acquisition costs', 
+    'Customer churn': 'Customer churn', 
+    'revenue churn': 'revenue churn', 
+    'net income': 'net income', 
+    'Revenues': 'Revenues', 
+    'Gross profit': 'Gross profit', 
+    'Net loss': 'Net loss', 
+    'MRR': 'MRR', 
+    'goodwill': 'goodwill', 
+    'Total property and equipment': 'Total property and equipment', 
+    'net operating expenses': 'net operating expenses', 
+    'cost of sales': 'cost of sales', 
+    'subscriber churn': 'subscriber churn', 
+    'GAAP Revenue': 'GAAP Revenue', 
+    'EBITDA': 'EBITDA',
+    'Non-GAAP Earnings': 'Non-GAAP Earnings', 
+    'Recurring Revenue': 'Recurring Revenue',
+    'operating income': 'operating income'}
+
 
 headers = {
     'user-agent': 'Sample @ <sample@sample.com>',
@@ -79,6 +128,7 @@ def get_data(cik, type, datea, dateb):
 
 def get_sheet(cik, form, datea, dateb):
     feature_dict = dict()
+
     list_tables = get_data(cik, form, datea, dateb)
     
     for table in list_tables:
@@ -86,9 +136,13 @@ def get_sheet(cik, form, datea, dateb):
         content = requests.get(table["url"], headers=headers).content
         bs_table = BeautifulSoup(content, features='lxml')
         trs = bs_table.table.find_all('tr')
+
         multiplier = 1
+
         for tr in trs:
+            
             tr_text = tr.text.lower()
+
             if "million" in tr_text:
                 multiplier = 1000000
             elif "billion" in tr_text:
@@ -97,34 +151,58 @@ def get_sheet(cik, form, datea, dateb):
                 multiplier = 1000
             elif "hundred" in tr_text:
                 multiplier = 100
-            for feature in features:
+            
+            for mod_feature in mod_features:
+
+                orig_feature = mod_to_orig[mod_feature]
                 
                 try:
-                    feature = feature.lower()
-                    featureWords = feature.split(" ")
+                    mod_feature = mod_feature.lower()
+                    featureWords = mod_feature.split(" ")
 
                     flag = True
                     for word in featureWords:
                         if word not in tr_text:
                             flag = False
                             break
-                    if flag==True:
-                        tds = tr.find_all('td')
-                        val_list = []
-                        if len(tds[1].text) < 20:
-                            td_text = tds[1].text.replace(",","")
-                            match_str = re.findall('([0-9\.\(\)]+)',td_text)
-                            if len(match_str) != 0:
-                                val_list.append(match_str[0])
-                        if len(val_list)>0:
-                            feature_dict[tds[0].text+" table = "+table['name_short']]=float(val_list[0])*multiplier
 
-                except:
+                    if flag==True:
+                        
+                        tds = tr.find_all('td')
+                        
+                        found = False
+
+                        for td in tds[1:2]:
+
+                            val_list = []
+
+                            if found:
+                                break
+
+                            if len(td.text) < 25:
+                                td_text = td.text.replace(",","")
+                                match_str = re.findall('([0-9\.\(\)]+)',td_text)
+                                if len(match_str) != 0:
+                                    val_list.append(match_str[0])
+                                    
+                            if len(val_list)>0:
+                                if val_list[0][0]=='(':
+                                    if val_list[0][-1]==')':
+                                        val_list[0]=val_list[0][1:-1]
+                                    else:
+                                        val_list[0]=val_list[0][1:]
+                                    val_list[0] = '-' + val_list[0]
+                                feature_dict[orig_feature] = feature_dict.get(orig_feature,float(val_list[0])*multiplier)
+                                found = True
+                            
+                except Exception as e:
+                    print("Exception in scrape_table ",e)
                     continue
+
+    for orig_feature in mod_to_orig.values():
+        feature_dict[orig_feature] = feature_dict.get(orig_feature,"NaN")
                 
             
     df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
     return df
 
-#print(get_sheet(1459417,"10-K","20210101", "20220101"))
-# print(feature_dict)
