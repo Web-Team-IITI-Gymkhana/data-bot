@@ -203,6 +203,5 @@ def get_sheet(cik, form, datea, dateb):
         feature_dict[orig_feature] = feature_dict.get(orig_feature,"NaN")
                 
             
-    df = pd.DataFrame(list(feature_dict.items()),columns=['Feature','Values'])
-    return df
+    return feature_dict
 
