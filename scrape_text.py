@@ -4,26 +4,30 @@ import re
 import requests
 import xml.etree.ElementTree as ET
 
-features = ("EBITDA","ARR","MRR",
-            "Marketable securities",
-            "Inventories",
-            "Stock Price",
-            "Total costs and expenses",
-            "Marketing Cost",
-            "Subscription Revenue",
-            "Gross property and equipment",
-            "Total debt",
-            "customer acquisition costs",
-            "Customer churn",
-            "revenue churn",
-            "Revenues",
-            "Total property and equipment",
-            "net operating expenses",
-            "subscriber churn",
-            "GAAP Revenue",
-            "Non-GAAP Earnings",
-            "Recurring Revenue",
-            "operating income")
+mod_to_orig = {
+    'Marketable securities': 'MarketableSecurities', 
+    'Inventories': 'Inventories',
+    'shares outstanding':'SharesOutstanding',
+    'Stock Price':'StockPrice',
+    'Sales Cost':'SalesCost', 
+    'Subscription Revenue' : 'SubscriptionRevenue',
+    'total operating expenses': 'TotalOperatingExpenses', 
+    'customer acquisition costs': 'CustomerAcquisitionCosts', 
+    'Customer churn': 'CustomerChurn', 
+    'revenue churn': 'RevenueChurn', 
+    'Revenues': 'Revenues', 
+    'Gross profit': 'GrossProfit', 
+    'MRR': 'MRR', 
+    'Total property and equipment': 'TotalPropertyAndEquipment', 
+    'net operating expenses': 'NetOperatingExpenses', 
+    'cost of sales': 'CostOfSales', 
+    'subscriber churn': 'SubscriberChurn', 
+    'GAAP Revenue': 'GAAPRevenue', 
+    'EBITDA': 'EBITDA',
+    'Non-GAAP Earnings': 'Non-GAAPEarnings', 
+    'Recurring Revenue': 'RecurringRevenue',
+    'operating income': 'OperatingIncome',
+    'ARR': 'ARR'}
 
 headers = {
     'user-agent': 'Sample @ <sample@sample.com>',
@@ -61,7 +65,7 @@ def get_scrape_text(cik, form, datea, dateb):
             req = http.request("GET",doc_url,headers=headers)
             docsoup = BeautifulSoup(req.data, features='lxml')
             data = docsoup.find_all(["span", "p"])
-            for feature in features:
+            for feature in mod_to_orig.keys():
                 value = []
                 final_values = []
                 orig = feature
@@ -100,12 +104,12 @@ def get_scrape_text(cik, form, datea, dateb):
                     final_values.append(num)
                 final_values=set(final_values)
                 if len(final_values)==1:
-                    feature_dict[orig] = feature_dict.get(orig,list(final_values)[0])
+                    feature_dict[mod_to_orig[orig]] = feature_dict.get(mod_to_orig[orig],list(final_values)[0])
                 elif len(final_values)>1:
-                    feature_dict[orig] = feature_dict.get(orig,max(list(final_values)))
+                    feature_dict[mod_to_orig[orig]] = feature_dict.get(mod_to_orig[orig],max(list(final_values)))
         except:
             continue
-    for feature in features:
-        feature_dict[feature] = feature_dict.get(feature,'NaN')
+    for feature in mod_to_orig.keys():
+        feature_dict[mod_to_orig[feature]] = feature_dict.get(mod_to_orig[feature],'NaN')
 
     return feature_dict
