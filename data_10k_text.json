@@ -1,9 +1,30 @@
 {
     "1459417": {
-        "2022": {
-            "loss": 70400000.0,
-            "cash": 608600000.0,
-            "gross profit": "Nan"
+        "2021": {
+            "Loss": 70400000.0,
+            "MarketableSecurities": "NaN",
+            "Inventories": "NaN",
+            "SharesOutstanding": "NaN",
+            "StockPrice": "NaN",
+            "SalesCost": "NaN",
+            "SubscriptionRevenue": "NaN",
+            "TotalOperatingExpenses": "NaN",
+            "CustomerAcquisitionCosts": "NaN",
+            "CustomerChurn": "NaN",
+            "RevenueChurn": "NaN",
+            "Revenues": "NaN",
+            "GrossProfit": "NaN",
+            "MRR": "NaN",
+            "TotalPropertyAndEquipment": "NaN",
+            "NetOperatingExpenses": "NaN",
+            "CostOfSales": "NaN",
+            "SubscriberChurn": "NaN",
+            "GAAPRevenue": "NaN",
+            "EBITDA": "NaN",
+            "Non-GAAPEarnings": "NaN",
+            "RecurringRevenue": "NaN",
+            "OperatingIncome": "NaN",
+            "ARR": "NaN"
         }
     }
 }

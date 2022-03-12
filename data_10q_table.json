@@ -1,6 +1,45 @@
 {
     "1459417": {
-        "Y2022 Q1": {
+        "Y2021 Q1": {
+            "Cash and Cash equivalents": "NaN",
+            "Marketable securities": "NaN",
+            "Inventories": "NaN",
+            "Common stock": "NaN",
+            "shares outstanding": "NaN",
+            "Total Stockholders Equity": "NaN",
+            "Stock Price": "NaN",
+            "Total costs and expenses": "NaN",
+            "Sales Cost": "NaN",
+            "Marketing Cost": "NaN",
+            "Subscription Revenue": "NaN",
+            "Property and equipment net": "NaN",
+            "Gross property and equipment": "NaN",
+            "Total current assets": "NaN",
+            "Total assets": "NaN",
+            "Total current liabilities": "NaN",
+            "Total equity": "NaN",
+            "Total debt": "NaN",
+            "total operating expenses": "NaN",
+            "customer acquisition costs": "NaN",
+            "Customer churn": "NaN",
+            "revenue churn": "NaN",
+            "net income": "NaN",
+            "Revenues": "NaN",
+            "Gross profit": "NaN",
+            "Net loss": "NaN",
+            "MRR": "NaN",
+            "goodwill": "NaN",
+            "Total property and equipment": "NaN",
+            "net operating expenses": "NaN",
+            "cost of sales": "NaN",
+            "subscriber churn": "NaN",
+            "GAAP Revenue": "NaN",
+            "EBITDA": "NaN",
+            "Non-GAAP Earnings": "NaN",
+            "Recurring Revenue": "NaN",
+            "operating income": "NaN"
+        },
+        "Y2021 Q2": {
             "Cash and Cash equivalents": 486830000.0,
             "Total current assets": 637570000.0,
             "Total assets": 637570000.0,
@@ -39,7 +78,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2022 Q2": {
+        "Y2021 Q3": {
             "Cash and Cash equivalents": 953107000.0,
             "Total current assets": 1135623000.0,
             "Total assets": 1135623000.0,
@@ -78,7 +117,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2022 Q3": {
+        "Y2021 Q4": {
             "Cash and Cash equivalents": 934348000.0,
             "Total current assets": 1115102000.0,
             "Total assets": 1115102000.0,
@@ -117,7 +156,46 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q1": {
+        "Y2020 Q1": {
+            "Cash and Cash equivalents": "NaN",
+            "Marketable securities": "NaN",
+            "Inventories": "NaN",
+            "Common stock": "NaN",
+            "shares outstanding": "NaN",
+            "Total Stockholders Equity": "NaN",
+            "Stock Price": "NaN",
+            "Total costs and expenses": "NaN",
+            "Sales Cost": "NaN",
+            "Marketing Cost": "NaN",
+            "Subscription Revenue": "NaN",
+            "Property and equipment net": "NaN",
+            "Gross property and equipment": "NaN",
+            "Total current assets": "NaN",
+            "Total assets": "NaN",
+            "Total current liabilities": "NaN",
+            "Total equity": "NaN",
+            "Total debt": "NaN",
+            "total operating expenses": "NaN",
+            "customer acquisition costs": "NaN",
+            "Customer churn": "NaN",
+            "revenue churn": "NaN",
+            "net income": "NaN",
+            "Revenues": "NaN",
+            "Gross profit": "NaN",
+            "Net loss": "NaN",
+            "MRR": "NaN",
+            "goodwill": "NaN",
+            "Total property and equipment": "NaN",
+            "net operating expenses": "NaN",
+            "cost of sales": "NaN",
+            "subscriber churn": "NaN",
+            "GAAP Revenue": "NaN",
+            "EBITDA": "NaN",
+            "Non-GAAP Earnings": "NaN",
+            "Recurring Revenue": "NaN",
+            "operating income": "NaN"
+        },
+        "Y2020 Q2": {
             "Cash and Cash equivalents": 138200000.0,
             "Total current assets": 275000000.0,
             "Total assets": 275000000.0,
@@ -156,7 +234,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q2": {
+        "Y2020 Q3": {
             "Cash and Cash equivalents": 194803000.0,
             "Total current assets": 324989000.0,
             "Total assets": 324989000.0,
@@ -195,7 +273,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q3": {
+        "Y2020 Q4": {
             "Cash and Cash equivalents": 481329000.0,
             "Total current assets": 635590000.0,
             "Total assets": 635590000.0,
@@ -236,7 +314,46 @@
         }
     },
     "1023731": {
-        "Y2022 Q1": {
+        "Y2021 Q1": {
+            "Cash and Cash equivalents": 106877000.0,
+            "Sales Cost": 28684000.0,
+            "Total current assets": 274264000.0,
+            "Total assets": 274264000.0,
+            "Property and equipment net": 94480000.0,
+            "goodwill": 132067000.0,
+            "Total current liabilities": 127754000.0,
+            "Common stock": 107000.0,
+            "Total Stockholders Equity": 167403000.0,
+            "Total equity": 167403000.0,
+            "total operating expenses": 171940000.0,
+            "Net loss": -40225000.0,
+            "cost of sales": 20040000.0,
+            "shares outstanding": 9191000.0,
+            "Total property and equipment": 94480000.0,
+            "Marketable securities": "NaN",
+            "Inventories": "NaN",
+            "Stock Price": "NaN",
+            "Total costs and expenses": "NaN",
+            "Marketing Cost": "NaN",
+            "Subscription Revenue": "NaN",
+            "Gross property and equipment": "NaN",
+            "Total debt": "NaN",
+            "customer acquisition costs": "NaN",
+            "Customer churn": "NaN",
+            "revenue churn": "NaN",
+            "net income": "NaN",
+            "Revenues": "NaN",
+            "Gross profit": "NaN",
+            "MRR": "NaN",
+            "net operating expenses": "NaN",
+            "subscriber churn": "NaN",
+            "GAAP Revenue": "NaN",
+            "EBITDA": "NaN",
+            "Non-GAAP Earnings": "NaN",
+            "Recurring Revenue": "NaN",
+            "operating income": "NaN"
+        },
+        "Y2021 Q2": {
             "Cash and Cash equivalents": "NaN",
             "Marketable securities": "NaN",
             "Inventories": "NaN",
@@ -275,7 +392,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2022 Q2": {
+        "Y2021 Q3": {
             "Cash and Cash equivalents": 109288000.0,
             "Sales Cost": 31711000.0,
             "Total current assets": 266230000.0,
@@ -314,7 +431,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2022 Q3": {
+        "Y2021 Q4": {
             "Cash and Cash equivalents": 102989000.0,
             "Sales Cost": 33026000.0,
             "Total current assets": 272875000.0,
@@ -353,7 +470,46 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q1": {
+        "Y2020 Q1": {
+            "Cash and Cash equivalents": 184794000.0,
+            "Sales Cost": 20749000.0,
+            "Total current assets": 302381000.0,
+            "Total assets": 302381000.0,
+            "Property and equipment net": 89776000.0,
+            "goodwill": 131000000.0,
+            "Total current liabilities": 121636000.0,
+            "Common stock": 101000.0,
+            "Total Stockholders Equity": 219491000.0,
+            "Total equity": 219491000.0,
+            "total operating expenses": 161735000.0,
+            "net income": -3623000.0,
+            "Net loss": -47071000.0,
+            "cost of sales": 13805000.0,
+            "shares outstanding": 3114000.0,
+            "Marketable securities": "NaN",
+            "Inventories": "NaN",
+            "Stock Price": "NaN",
+            "Total costs and expenses": "NaN",
+            "Marketing Cost": "NaN",
+            "Subscription Revenue": "NaN",
+            "Gross property and equipment": "NaN",
+            "Total debt": "NaN",
+            "customer acquisition costs": "NaN",
+            "Customer churn": "NaN",
+            "revenue churn": "NaN",
+            "Revenues": "NaN",
+            "Gross profit": "NaN",
+            "MRR": "NaN",
+            "Total property and equipment": "NaN",
+            "net operating expenses": "NaN",
+            "subscriber churn": "NaN",
+            "GAAP Revenue": "NaN",
+            "EBITDA": "NaN",
+            "Non-GAAP Earnings": "NaN",
+            "Recurring Revenue": "NaN",
+            "operating income": "NaN"
+        },
+        "Y2020 Q2": {
             "Cash and Cash equivalents": "NaN",
             "Marketable securities": "NaN",
             "Inventories": "NaN",
@@ -392,7 +548,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q2": {
+        "Y2020 Q3": {
             "Cash and Cash equivalents": 116690000.0,
             "Sales Cost": 24247000.0,
             "Total current assets": 267801000.0,
@@ -431,7 +587,7 @@
             "Recurring Revenue": "NaN",
             "operating income": "NaN"
         },
-        "Y2021 Q3": {
+        "Y2020 Q4": {
             "Cash and Cash equivalents": 121848000.0,
             "Sales Cost": 26334000.0,
             "Total current assets": 268539000.0,
