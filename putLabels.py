@@ -1,4 +1,4 @@
-
+import pandas as pd
 from asyncio.windows_events import NULL
 from cmath import nan
 import json
@@ -115,13 +115,13 @@ for cik in data:
         'MagicNumber':MagicNumber,       
       }
 
-      print(ratios)
-
+      rato= pd.DataFrame(ratios.items(),columns=['Ratios','Ratio Values'])
+      print(rato)
       break
   
 f.close()
 
-result = {
+"""'result = {
   'GrossProfit': nan, 
   'GrossMargin': nan, 
   'WorkingCapitalRatio': 3.8039637577521708, 
@@ -136,4 +136,4 @@ result = {
   'RuleOf40': nan, 
   'MarketCap': nan, 
   'MagicNumber': nan
-}
+}'"""
