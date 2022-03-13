@@ -9,9 +9,12 @@ ciks = companies["CIK"].astype(int).tolist()
 years = [2022, 2021]
 months = ["01", "03", "06", "09", "12"]
 
+# 100:110 //mihir 1
+# 140:150 //mihir2
+
 data_10k_table = dict()
 
-for cik in ciks[0:10]:
+for cik in ciks[140:150]:
     year_dict = dict()
     for year in years:
         try:
@@ -20,15 +23,16 @@ for cik in ciks[0:10]:
             year_dict[year-1] = year_data
         except:
             continue
+    print(cik," 10k completed")
     data_10k_table[cik] = year_dict
 
-with open("data_10k_table.json", 'w') as f:
+with open("data_10k_table_mihir_2.json", 'w') as f:
     json.dump(data_10k_table, f, indent=4)
 
 
 data_10q_table = dict()
 
-for cik in ciks[0:10]:
+for cik in ciks[140:150]:
     year_dict = dict()
     for year in years:
         for i in range(len(months)-1):
@@ -38,9 +42,10 @@ for cik in ciks[0:10]:
                 year_dict["Y"+str(year-1)+" Q"+str(i+1)] = quarter_data
             except:
                 continue
+    print(cik," 10q completed")
     data_10q_table[cik] = year_dict
 
-with open("data_10q_table.json", 'w') as f:
+with open("data_10q_table_mihir_2.json", 'w') as f:
     json.dump(data_10q_table, f, indent=4)
 
 print("Done with bulk scraping")
