@@ -26,7 +26,7 @@ Gross Margin = (Revenue - Cost of Goods Sold) / Revenue
 epsilon = 0.000000000000000000001
 
 for cik in data:
-  if cik == "1585521":
+  if cik == "1108524":
     for dt in data[cik]: 
       print(f"cik: {cik}", end=" ")
       print(f"date: {dt}", end=" \n")
@@ -72,7 +72,7 @@ for cik in data:
       ReturnOfEquity = (cur['NetIncome'] /  cur ['TotalStockholdersEquity']) * 100 
 
       # EBIDTA
-      EBIDTAratio = cur['Revenues'] - cur['TotalCostsAndExpenses'] 
+      EBIDTAratio = cur['Revenues'] - cur['NetOperatingExpenses']
       
       #Churn Rate 
       ChurnRate = cur['CustomerChurn']
@@ -93,10 +93,10 @@ for cik in data:
       
       
       # Market Cap	= Total Outstanding Share * Share Price
-      MarketCap = cur['CommonStock'] * cur['StockPrice']
+      MarketCap = cur['SharesOutstanding'] * cur['StockPrice']
       
       # Magic Number = Net New MRR * 4 of current quarter/ Sales and Marketing of prev quarter
-      MagicNumber = cur['ARR'] / prev['CostOfSales']
+      MagicNumber = cur['ARR'] / prev['SalesCost']
 
       ratios = {
         'GrossProfit':GrossProfit,
