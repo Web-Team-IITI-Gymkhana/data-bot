@@ -76,18 +76,11 @@ def get_scrape_text(cik, form, datea, dateb):
                     if len(feature_match)!=0 and '$' in feature_match[0]:
                         x = feature_match[0].strip()
                         lines = x.split(". ")
-                        if len(lines)==1:
-                            for line in lines:
-                                if feature in line:
-                                    match = re.findall('\$([0-9\.]*)\s(billion|million|thousand|hundred)', line)
-                                    if len(match)>0:
-                                        value.append(f'{match[0][0]} {match[0][1]}')
-                        else:
-                            for line in lines:
-                                if feature in line:
-                                    match = re.findall('\$([0-9\.]*)\s(billion|million|thousand|hundred)', line)
-                                    if len(match)>0:
-                                        value.append(f'{match[0][0]} {match[0][1]}')
+                        for line in lines:
+                            if feature in line:
+                                match = re.findall('\$([0-9\.\,]*)\s(billion|million|thousand|hundred)', line)
+                                if len(match)>0:
+                                    value.append(f'{match[0][0].replace(",","")} {match[0][1]}')
 
                 for figure in value:
                     num, multiplier = figure.split(" ")
