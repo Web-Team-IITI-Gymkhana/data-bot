@@ -1,7 +1,7 @@
 from flask import Flask, request, Response
 import firebase_admin
 from firebase_admin import credentials, firestore
-from pipeline import get_data
+from pipeline import get_data, get_metadata
 
 app = Flask(__name__)
 
@@ -35,7 +35,7 @@ def add_form():
 @app.route('/company', methods=('POST'))
 def add_company():
     cik = request.form.get('cik')
-    # data = get_company_data(cik)
+    data = get_metadata(cik)
     db.collection("company").document(cik).set(data)
     return Response(status=401)
 

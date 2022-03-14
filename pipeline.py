@@ -59,7 +59,6 @@ def get_metadata(cik):
         try:
             if prop == 'hasHoldingClassification':
                 if 'public' in perm_id_data[prop]:
-                    print(True)
                     data[metadata_prop[prop]] = "Public"
             elif prop == "mdaas:HeadquartersAddress":
                 data[metadata_prop[prop]] = perm_id_data[prop].replace("\n", " ")
