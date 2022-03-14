@@ -1,11 +1,11 @@
 import scrape_table
 import scrape_text
 
-quarter = [("0101","0331"), ("0401", "0630"), ("0701", "0930"), ("1001", "1231")]
+quarters = [("0101","0331"), ("0401", "0630"), ("0701", "0930"), ("1001", "1231")]
 
 def get_10k(cik, year):
-    year_table = scrape_table.get_sheet(cik, "10-K", f"{year-1}0101", f"{year}0101")
-    year_text = scrape_text.get_scrape_text(cik,"10-K",f"{year-1}0101",f"{year}0101")
+    year_table = scrape_table.get_sheet(cik, "10-K", f"{year}0101", f"{year+1}0101")
+    year_text = scrape_text.get_scrape_text(cik,"10-K",f"{year}0101",f"{year+1}0101")
     for key in year_table.keys():
         if year_table[key] == 'NaN':
             if key in year_text.keys():
@@ -14,8 +14,8 @@ def get_10k(cik, year):
     return year_table
 
 def get_10q(cik, year, quarter):
-    quarter_table = scrape_table.get_sheet(cik, "10-Q", f"{year-1}"+quarter[quarter-1][0], f"{year-1}"+quarter[quarter-1][1])
-    quarter_text = scrape_text.get_scrape_text(cik,"10-Q", f"{year-1}"+quarter[quarter-1][0], f"{year-1}"+quarter[quarter-1][1])
+    quarter_table = scrape_table.get_sheet(cik, "10-Q", f"{year}"+quarters[quarter-1][0], f"{year}"+quarters[quarter-1][1])
+    quarter_text = scrape_text.get_scrape_text(cik,"10-Q", f"{year}"+quarters[quarter-1][0], f"{year}"+quarters[quarter-1][1])
     for key in quarter_table.keys():
         try:
             if quarter_table[key] == 'NaN':
@@ -28,6 +28,6 @@ def get_10q(cik, year, quarter):
 
 def get_data(cik, form, year, quarter):
     if form=="10-K":
-        get_10k(cik,year)
+        return get_10k(cik,year)
     elif form=="10-Q":
-        get_10q(cik,year,quarter)
+        return get_10q(cik,year,quarter)
