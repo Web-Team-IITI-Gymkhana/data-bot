@@ -23,6 +23,7 @@ Magic Number = Net New MRR * 4 of current quarter/ Sales and Marketing of prev q
 Gross Profit = Revenue - Cost of Goods Sold
 Gross Margin = (Revenue - Cost of Goods Sold) / Revenue 
 '''
+epsilon = 0.000000000000000000001
 
 for cik in data:
   if cik == "1585521":
@@ -31,8 +32,8 @@ for cik in data:
       print(f"date: {dt}", end=" \n")
       curDate = int(dt)
       prevDate = curDate - 1
-      if data[cik][str(prevDate)] == NULL:
-        assert('previous date not available')
+      if str(prevDate) not in data[cik]:
+        prevDate = curDate # just to prevent NaN error
     
       # Definitions
       # ============================================================================================ #
@@ -40,12 +41,11 @@ for cik in data:
       cur = data[cik][dt]
 
       for keys in cur:
-        cur[keys] = float(cur[keys]) + 0.00000000000000001
+        cur[keys] = float(cur[keys]) + epsilon
       
       for keys in prev:
-        prev[keys] = float(prev[keys])+0.00000000000000001
+        prev[keys] = float(prev[keys]) + epsilon
 
-      print(cur['NetIncome'])
       cur['ARR'] = (cur['MRR'] * 4)
       prev['ARR'] = (prev['MRR'] * 4)
       # ============================================================================================= #
@@ -76,7 +76,7 @@ for cik in data:
       
       #Churn Rate 
       ChurnRate = cur['CustomerChurn']
-      if (ChurnRate == float('nan')):
+      if (ChurnRate):
         ChurnRate = (cur['SubscriptionRevenue'] - prev['SubscriptionRevenue']) / prev['SubscriptionRevenue']
 
       # Growth Rate 
@@ -117,23 +117,6 @@ for cik in data:
 
       rato= pd.DataFrame(ratios.items(),columns=['Ratios','Ratio Values'])
       print(rato)
-      break
+    break
   
 f.close()
-
-"""'result = {
-  'GrossProfit': nan, 
-  'GrossMargin': nan, 
-  'WorkingCapitalRatio': 3.8039637577521708, 
-  'EarningPerShare': 1818600000000.9998, 
-  'DebtToEquityRatio': 0.32635121466796796, 
-  'PEratio': nan, 
-  'ReturnOfEquity': 0.4710462972774568, 
-  'EBIDTAratio': nan, 
-  'ChurnRate': nan, 
-  'GrowthRate': nan, 
-  'ProfitMargin': 33.07478413578729, 
-  'RuleOf40': nan, 
-  'MarketCap': nan, 
-  'MagicNumber': nan
-}'"""
