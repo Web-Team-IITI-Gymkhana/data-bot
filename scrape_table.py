@@ -181,7 +181,7 @@ def get_sheet(cik, form, datea, dateb):
 
                             if len(td.text) < 25:
                                 td_text = td.text.replace(",","")
-                                match_str = re.findall('([0-9\.\(\)]+)',td_text)
+                                match_str = re.findall('([0-9\.\(\)\,]+)',td_text)
                                 if len(match_str) != 0:
                                     val_list.append(match_str[0])
                                     
@@ -192,6 +192,7 @@ def get_sheet(cik, form, datea, dateb):
                                     else:
                                         val_list[0]=val_list[0][1:]
                                     val_list[0] = '-' + val_list[0]
+                                val_list[0] = val_list[0].replace(",", "")
                                 feature_dict[orig_feature] = feature_dict.get(orig_feature,float(val_list[0])*multiplier)
                                 found = True
                             
@@ -204,4 +205,3 @@ def get_sheet(cik, form, datea, dateb):
                 
             
     return feature_dict
-
