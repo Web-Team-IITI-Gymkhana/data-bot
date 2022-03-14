@@ -1,6 +1,7 @@
 from flask import Flask, request, Response
 import firebase_admin
 from firebase_admin import credentials, firestore
+from pipeline import get_data
 
 app = Flask(__name__)
 
@@ -26,7 +27,7 @@ def add_form():
     except Exception:
         return Response("invalid quarter number",status=401)
 
-    # data = scraper(form_uid) # data in json format
+    data = get_data(cik, form_type, year, quarter)
 
     db.collection("company").document(cik).collection(form_type).document(form_uid).set(data)
     return Response(status=200)
