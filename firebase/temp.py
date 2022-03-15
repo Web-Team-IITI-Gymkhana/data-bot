@@ -52,8 +52,8 @@ for cik in company_list:
         # print(cur, prev)
         ratios, rato = rf.setup_ratios(cur, prev)
 
-        ratiodf= pd.DataFrame(ratios.items())
-        ratiodf, ratiodf.columns= ratiodf, ratiodf.keys()
+        ratiodf= pd.DataFrame(cur.items())
+        ratiodf, ratiodf.columns= ratiodf.T, cur.keys()
         ratiodf.drop(index=ratiodf.index[0],axis=0, inplace=True)
 
         rider_provider = cik + '_' + date

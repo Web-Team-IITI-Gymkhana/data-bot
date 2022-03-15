@@ -3,7 +3,7 @@ import pandas as pd
 
 class ideal_extract:
   def wce(self, r):
-    if r>=1.5 and r<=2:
+    if r>=1 and r<=2:
       return 1
     else: 
       return 0  
@@ -103,7 +103,10 @@ class ratios:
           pass
 
       cur['ARR'] = (cur['MRR'] * 12)
+      cur['ARR'] = (cur['NetIncome'])
       prev['ARR'] = (prev['MRR'] * 12)
+      prev['ARR'] = (prev['NetIncome'])
+
       # ============================================================================================= #
 
       # Gross Profit = Revenue - Cost of Goods Sold
@@ -192,11 +195,11 @@ class ratios:
       rato['eps_label']=rato['EarningPerShare'].apply(rfex.eps)
       rato['de_label']=rato['DebtToEquityRatio'].apply(rfex.de)
       rato['pe_label']=rato['PEratio'].apply(rfex.pe)
-      rato['roe_label']=rato['WorkingCapitalRatio'].apply(rfex.roe)
+      rato['roe_label']=rato['ReturnOfEquity'].apply(rfex.roe)
       rato['growth_rate_label']=rato['GrowthRate'].apply(rfex.growth_rate)
       rato['profitm_label']=rato['ProfitMargin'].apply(rfex.profit_margin)
       rato['grossm_label']=rato['GrossMargin'].apply(rfex.gross_margin)
-      rato['ro40_label']=rato['ReturnOfEquity'].apply(rfex.ro40)
+      rato['ro40_label']=rato['RuleOf40'].apply(rfex.ro40)
       rato['churnrate_label']=rato['ChurnRate'].apply(rfex.chun_rate)
       rato['EVbyEbidta_label']=rato['EVbyEbidta'].apply(rfex.ev_ebidta)
       rato['marketCap_label']=rato['MarketCap'].apply(rfex.market_cap)
