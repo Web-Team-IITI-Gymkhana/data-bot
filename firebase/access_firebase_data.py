@@ -1,15 +1,26 @@
+import json
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
+from firebase_admin import credentials, firestore
 
-# Fetch the service account key JSON file contents
-cred = credentials.Certificate('../../sass-db-firebase-adminsdk-4gh5l-4b1dd3dc87.json')
+cred = credentials.Certificate('../serviceAccount.json')
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
-# Initialize the app with a service account, granting admin privileges
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://databaseName.firebaseio.com'
-})
+def load_forms():
+    for form_type in ("10k","10q"):
+        with open(f"json/data_{form_type}_text(dummy).json") as f:
+            data = json.load(f)
 
-# As an admin, the app has access to read and write all data, regradless of Security Rules
-ref = db.reference('/')
-print(ref.get())
+        for cik in data:
+            for year in data[cik]:
+                print(f"pushed company {cik}, year {year}")
+
+def load_company():
+    with open(f"json/data_10k_table(dummy).json") as f:
+        data = json.load(f)
+
+        for cik in data:
+            add_company(cik)
+            print(f"pushed company {cik}")
+
+load_company()
