@@ -10,7 +10,6 @@ mod_features = [
     "Marketable securities",
     "Inventories",
     "Common stock",
-    "shares outstanding",
     "Total Stockholders Equity",
     "Stock Price",
     "Total costs expenses",
@@ -43,6 +42,7 @@ mod_features = [
     "Non-GAAP Earnings",
     "Recurring Revenue",
     "operating income",
+    "shares outstanding",
 ]
 
 mod_to_orig = {
@@ -50,7 +50,6 @@ mod_to_orig = {
     'Marketable securities': 'MarketableSecurities', 
     'Inventories': 'Inventories',
     'Common stock' : 'CommonStock',
-    'shares outstanding':'SharesOutstanding',
     'Total Stockholders Equity':'TotalStockholdersEquity',
     'Stock Price':'StockPrice',
     'Total costs expenses':'TotalCostsAndExpenses',
@@ -82,7 +81,8 @@ mod_to_orig = {
     'EBITDA': 'EBITDA',
     'Non-GAAP Earnings': 'Non-GAAPEarnings', 
     'Recurring Revenue': 'RecurringRevenue',
-    'operating income': 'OperatingIncome'}
+    'operating income': 'OperatingIncome',
+    'shares outstanding':'SharesOutstanding'}
 
 
 headers = {
@@ -122,6 +122,12 @@ def get_data(cik, type, datea, dateb):
             report_dict['name_short'] = report.shortname.text
             report_dict['url'] = gen_url + report.htmlfilename.text
 
+            shortname = report_dict['name_short']
+            shortname = shortname.lower()
+
+            if 'summary' in shortname:
+                continue
+
             master_reports.append(report_dict)
     return master_reports
 
@@ -151,11 +157,11 @@ def get_sheet(cik, form, datea, dateb):
                 multiplier = 1000
             elif "hundred" in tr_text:
                 multiplier = 100
-            
+
             for mod_feature in mod_features:
 
                 orig_feature = mod_to_orig[mod_feature]
-                
+
                 try:
                     mod_feature = mod_feature.lower()
                     featureWords = mod_feature.split(" ")
@@ -165,14 +171,22 @@ def get_sheet(cik, form, datea, dateb):
                         if word not in tr_text:
                             flag = False
                             break
+                    
+                    if orig_feature=="NetIncome":
+                        ind1 = tr_text.find("net")
+                        ind2 = tr_text.find("income")
+
+                        if ind1>ind2:
+                            flag = False
+                            
 
                     if flag==True:
                         
                         tds = tr.find_all('td')
                         
                         found = False
-
-                        for td in tds[1:2]:
+                        
+                        for td in tds[1:5]:
 
                             val_list = []
 
@@ -184,6 +198,7 @@ def get_sheet(cik, form, datea, dateb):
                                 match_str = re.findall('([0-9\.\(\)\,]+)',td_text)
                                 if len(match_str) != 0:
                                     val_list.append(match_str[0])
+                                
                                     
                             if len(val_list)>0:
                                 if val_list[0][0]=='(':
@@ -193,7 +208,10 @@ def get_sheet(cik, form, datea, dateb):
                                         val_list[0]=val_list[0][1:]
                                     val_list[0] = '-' + val_list[0]
                                 val_list[0] = val_list[0].replace(",", "")
-                                feature_dict[orig_feature] = feature_dict.get(orig_feature,float(val_list[0])*multiplier)
+                                if orig_feature=='SharesOutstanding' or orig_feature=='CommonStock' :
+                                    feature_dict[orig_feature] = feature_dict.get(orig_feature,float(val_list[0]))
+                                else:
+                                    feature_dict[orig_feature] = feature_dict.get(orig_feature,float(val_list[0])*multiplier)
                                 found = True
                             
                 except Exception as e:
