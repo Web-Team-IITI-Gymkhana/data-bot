@@ -6,7 +6,6 @@ cred = credentials.Certificate('../serviceAccount.json')
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-<<<<<<< HEAD
 # all collections
 # for doc in db.collections():
 #     print(u'{}'.format(doc.id))
@@ -106,23 +105,3 @@ Needed
         "doc_url": "https://www.sec.gov/Archives/edgar/data/1585521/000158552120000299/zm-20201031.htm"
     },
 '''
-=======
-def load_forms():
-    for form_type in ("10k","10q"):
-        with open(f"json/data_{form_type}_text(dummy).json") as f:
-            data = json.load(f)
-
-        for cik in data:
-            for year in data[cik]:
-                print(f"pushed company {cik}, year {year}")
-
-def load_company():
-    with open(f"json/data_10k_table(dummy).json") as f:
-        data = json.load(f)
-
-        for cik in data:
-            add_company(cik)
-            print(f"pushed company {cik}")
-
-load_company()
->>>>>>> 8fedaacc13dd12d2147e5c676b2107e3badf8a30
