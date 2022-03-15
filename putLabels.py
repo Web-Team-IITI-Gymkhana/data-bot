@@ -3,11 +3,87 @@ from asyncio.windows_events import NULL
 from cmath import nan
 import json
  
-f = open('data_10k_table(dummy).json')
+f = open('json/data_10k_table(dummy).json')
 
  
 data = json.load(f)
 
+def wce(r):
+  if r>=1.5 and r<=2:
+    return 1
+  else: 
+    return 0  
+"================================================"
+def de(r):
+  if r>=0.5 and r<=1.5:
+    return 1
+  else: 
+    return 0 
+"================================================"
+def eps(r):
+  if r>=1 and r<=99:
+    return 1
+  else: 
+    return 0 
+"================================================"
+def pe(r):
+  if r>13:
+    return 1
+  else: 
+    return 0
+"================================================"
+def roe(r):
+  if r>15:
+    return 1
+  else: 
+    return 0
+"================================================"
+def ro40(r):
+  if r>40:
+    return 1
+  else: 
+    return 0
+"================================================"
+def market_cap(r):
+  if r>2000000000:
+    return 1
+  else: 
+    return 0
+"================================================"
+def growth_rate(r):
+  if r>60:
+    return 1
+  else: 
+    return 0
+"================================================"
+def profit_margin(r):
+  if r>20:
+    return 1
+  else: 
+    return 0
+"================================================"
+def gross_margin(r):
+  if r>0.5:
+    return 1
+  else: 
+    return 0
+"================================================"
+def magic_num(r):
+  if r>1:
+    return 1
+  else: 
+    return 0
+"================================================"
+def chun_rate(r):
+  try:
+    if r<1:
+      return 1
+    else: 
+      return 0
+  except:
+    return 0  
+
+"=============================================="
 '''
 Working Capital Ratio	= Total Current Assets / Total Current Liabilities 
 Earning Per Share	= Profit ( or Income ) / Ang common outstanding shares 
@@ -118,7 +194,22 @@ for cik in data:
       rato= pd.DataFrame(ratios.items())
       rato, rato.columns= rato.T, ratios.keys()
       rato.drop(index=rato.index[0],axis=0, inplace=True)
-      print(rato)
+      #print(rato)
+      rato['wce_label']=rato['WorkingCapitalRatio'].apply(wce)
+      rato['eps_label']=rato['EarningPerShare'].apply(eps)
+      rato['de_label']=rato['DebtToEquityRatio'].apply(de)
+      rato['pe_label']=rato['PEratio'].apply(pe)
+      rato['roe_label']=rato['WorkingCapitalRatio'].apply(roe)
+      rato['growth_rate_label']=rato['GrowthRate'].apply(growth_rate)
+      rato['profitm_label']=rato['ProfitMargin'].apply(profit_margin)
+      rato['grossm_label']=rato['GrossMargin'].apply(gross_margin)
+      rato['ro40_label']=rato['ReturnOfEquity'].apply(ro40)
+      rato['churnrate_label']=rato['ChurnRate'].apply(chun_rate)
+      rato['marketCap_label']=rato['MarketCap'].apply(market_cap)
+      rato['magicNum_label']=rato['MagicNumber'].apply(magic_num)
+
+      print(rato.iloc[:,-9:])
     break
-  
+
+
 f.close()
