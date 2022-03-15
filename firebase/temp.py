@@ -1,6 +1,9 @@
 import json
 import firebase_admin
+import pandas as pd
 from firebase_admin import credentials, firestore
+from scrape import get_data
+
 import access_util as au
 epsilon = 1e-20
 
@@ -23,75 +26,57 @@ print(company_list)
 
 # all documents.collections
 count_to_display = 3
+netcsv = []
+netvalues = []
 for cik in company_list:
     if count_to_display == 0: break
     for date in ("2021", "2020"):
-        x = myCollection.document(cik).collection("10k").document(date).get()
-        
-        cur = x.to_dict()
-        keys = x.to_dict().keys()
-        print(f"{cik} + {date} has MarketableSecurities: {cur['MarketableSecurities']}")
+        # x = myCollection.document(cik).collection("10k").document(date).get()
+        x = get_data(cik, "10-K", int(date))
+        cur = x[(date)]
+        keys = x.keys()
+        # print(cur)
+        # print(f"{cik} + {date} has : {cur['MarketableSecurities']}")
         prevDate = int(date) - 1
         try:
-            y = myCollection.document(cik).collection("10k").document(prevDate).get()
+            # y = myCollection.document(cik).collection("10k").document(prevDate).get()
+            y = get_data(cik, "10-K", int(prevDate))
+            prev = y[(prevDate)]
         except:
             y = x
-        prev = y.to_dict()
-
-        data = {
-            "CashAndCashEquivalents": 2240303000.0,
-            "MarketableSecurities": 2004410000.0,
-            "TotalCurrentAssets": 4792865000.0,
-            "TotalAssets": 4792865000.0,
-            "PropertyAndEquipmentNet": 149924000.0,
-            "Goodwill": 24340000.0,
-            "TotalCurrentLiabilities": 1259966000.0,
-            "SharesOutstanding": 293714045,
-            "CommonStock": 292000.0,
-            "TotalStockholdersEquity": 3860767000.0,
-            "TotalEquity": 3860767000.0,
-            "GrossProfit": 1829379000.0,
-            "TotalOperatingExpenses": 1169531000.0,
-            "NetIncome": 671527000,
-            "GrossPropertyAndEquipment": 201879000.0,
-            "NetLoss": 341487000.0,
-            "Inventories": 0,
-            "StockPrice": 396	,
-            "TotalCostsAndExpenses": 685000000,
-            "SalesCost": 700000000,
-            "MarketingCost": 700000000,
-            "SubscriptionRevenue": 326000000,
-            "TotalDebt": 198000000,
-            "CustomerAcquisitionCosts": "NaN",
-            "CustomerChurn": "NaN",
-            "RevenueChurn": "NaN",
-            "Revenues": 3911000000,
-            "MRR": 326000000,
-            "TotalPropertyAndEquipment": "NaN",
-            "NetOperatingExpenses": 1992000000,
-            "CostOfSales": 700000000,
-            "SubscriberChurn": "NaN",
-            "GAAPRevenue": 287598299	,
-            "EBITDA": 793000000,
-            "Non-GAAPEarnings": 983000000,
-            "RecurringRevenue": "NaN",
-            "OperatingIncome": 1068000000,
-        }
-
-        for key in data.keys():
-            if (key not in cur) :
-                cur[key] = epsilon
-            if (key not in prev) :
-                prev[key] = epsilon
+            prev = y[(date)]
 
         # use cur and prev to get ratios and label company
         rf = au.ratios
+
         # print(cur, prev)
-        rf.setup_ratios(cur, prev)
+        ratios, rato = rf.setup_ratios(cur, prev)
+
+        ratiodf= pd.DataFrame(ratios.items())
+        ratiodf, ratiodf.columns= ratiodf, ratiodf.keys()
+        ratiodf.drop(index=ratiodf.index[0],axis=0, inplace=True)
+
+        rider_provider = cik + '_' + date
+        rato.insert(0,'rider_provider', rider_provider)
+        rato.set_index('rider_provider')
+        ratiodf.insert(0,'rider_provider', rider_provider)
+        ratiodf.set_index('rider_provider')
+        # print(rato.iloc[:,-13:])
+        # print(rato)
+        netcsv.append(rato)
+        netvalues.append(ratiodf)
 
     count_to_display -= 1
 
-print(keys)
+# print(netcsv)
+result = pd.concat(netcsv)
+# print(result)
+result.to_csv("labels.csv", index = True) 
+
+result = pd.concat(netvalues)
+# print(result)
+result.to_csv("data_values.csv", index = True) 
+
 
 
 
