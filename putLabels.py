@@ -3,7 +3,7 @@ from asyncio.windows_events import NULL
 from cmath import nan
 import json
  
-f = open('data_10k_table(dummy).json')
+f = open('json/data_10k_table(dummy).json')
 
  
 data = json.load(f)
