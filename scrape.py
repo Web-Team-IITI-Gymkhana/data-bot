@@ -45,6 +45,9 @@ headers = {
 http = urllib3.PoolManager()
 
 def get_accn(cik, form, year):
+    if form=="10-K":
+        year = year+1
+
     endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"
     param = {'action': 'getcompany',
             'CIK': cik,
@@ -77,6 +80,21 @@ def get_doc_url(cik, accn, form):
     file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
     doc_url = gen_url + file_name
     return doc_url
+
+def get_all_stock_price(cik):
+    token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
+    l = len(str(cik))
+    cik = "0"*(10-l)+str(cik)
+    perm_id = requests.get(
+        "https://api-eit.refinitiv.com/permid/search?q=cik:{}&access-token={}".format(cik, token))
+    perm_id_req = requests.get(perm_id.json()['result']['organizations']['entities'][0]['@id'], headers={
+                             "Accept": "application/ld+json", "x-ag-access-token": token})
+    quote_detail = requests.get(perm_id_req.json()["hasOrganizationPrimaryQuote"], headers={"Accept": "application/ld+json", "x-ag-access-token": token})
+    ticker = quote_detail.json()["tr-fin:hasExchangeTicker"]
+    alpha_token = "XZVMA05SP371BARG"
+    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol={ticker}&apikey={alpha_token}'
+    data_req = requests.get(url)
+    return data_req.json()['Monthly Time Series']
 
 def get_text_data(doc_soup):
     text_data = dict()
@@ -123,7 +141,9 @@ def get_text_data(doc_soup):
             text_data[text_feature] = text_data.get(text_feature,"NaN")
     return text_data
 
-def get_table_data(doc_soup, year):
+def get_table_data(doc_soup, year, form):
+    if form == "10-K":
+        year +=1
     table_data = dict()
     for feature in features.keys():
         try:            
@@ -146,10 +166,12 @@ def get_table_data(doc_soup, year):
             continue
     return table_data
 
+
 def get_data(cik, form, year):
     feature_dict = dict()
     quarter = 3
     accn_date_list = get_accn(cik, form, year)
+    stock_prices = get_all_stock_price(cik)
     for accn, date in accn_date_list:
         data = dict()
         try:
@@ -160,8 +182,21 @@ def get_data(cik, form, year):
             req = http.request("GET",data["DocURL"],headers=headers)
             doc_soup = BeautifulSoup(req.data, features='lxml')
             
-            table_data = get_table_data(doc_soup, year)
+            table_data = get_table_data(doc_soup, year, form)
             text_data = get_text_data(doc_soup)
+            
+            if table_data['StockPrice'] == "NaN":
+                if form == "10-K":
+                    for stock_date in stock_prices.keys():
+                        if stock_date.split("-")[1] == '01' and stock_date.split("-")[0] == str(year+1):
+                            table_data['StockPrice'] = float(stock_prices[stock_date]['4. close'])
+                            break
+                elif form == "10-Q":
+                    stock_quarter = ["04", "07", "10"]
+                    for stock_date in stock_prices.keys():
+                        if stock_date.split("-")[1] == stock_quarter[quarter-1] and stock_date.split("-")[0] == str(year):
+                            table_data['StockPrice'] = float(stock_prices[stock_date]['4. close'])
+                            break
 
             data = {**table_data, **text_data, **data}
 
@@ -169,11 +204,11 @@ def get_data(cik, form, year):
                 feature_dict[f"{year}_{quarter}"] = data
                 quarter -= 1 
             else:
-                feature_dict[f"{year-1}"] = data
+                feature_dict[f"{year}"] = data
 
         except: continue
     return feature_dict
 
-# import json
-# with open('./json/newSchema_10k.json','w') as f:
-#     json.dump(get_data(1585521, "10-Q", 2020), f, indent=4)
+import json
+with open('./json/newSchema_10q.json','w') as f:
+    json.dump(get_data(1585521, "10-Q", 2020),f,indent=4)
