@@ -20,32 +20,39 @@ company_list = []
 for doc in myCollection.stream():
     company_list.append(doc.id)
     # print(u'{} => {}'.format(doc.id, doc.to_dict()))
-    
+
+# cik list from csv    
+comps = pd.read_csv('..\csv\GoodCom.csv')
+company_list = comps['CIK'].to_numpy().astype('int').astype('str')
+
 print("company_list cik numbers:")
 print(company_list)
 
 # all documents.collections
-count_to_display = 3
+count_to_display = 1000
 netcsv = []
 netvalues = []
 for cik in company_list:
     if count_to_display == 0: break
     for date in ("2021", "2020"):
+        print(f"year: {date}, cik = {cik}")
         # x = myCollection.document(cik).collection("10k").document(date).get()
-        x = get_data(cik, "10-K", int(date))
-        cur = x[(date)]
-        keys = x.keys()
-        # print(cur)
-        # print(f"{cik} + {date} has : {cur['MarketableSecurities']}")
-        prevDate = int(date) - 1
         try:
-            # y = myCollection.document(cik).collection("10k").document(prevDate).get()
-            y = get_data(cik, "10-K", int(prevDate))
-            prev = y[(prevDate)]
+            x = get_data(cik, "10-K", int(date))
+            cur = x[(date)]
+            keys = x.keys()
+            # print(cur)
+            # print(f"{cik} + {date} has : {cur['MarketableSecurities']}")
+            prevDate = int(date) - 1
+            try:
+                # y = myCollection.document(cik).collection("10k").document(prevDate).get()
+                y = get_data(cik, "10-K", int(prevDate))
+                prev = y[(prevDate)]
+            except:
+                y = x
+                prev = y[(date)]
         except:
-            y = x
-            prev = y[(date)]
-
+            continue
         # use cur and prev to get ratios and label company
         rf = au.ratios
 
