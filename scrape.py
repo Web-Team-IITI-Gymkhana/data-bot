@@ -219,8 +219,35 @@ def get_data(cik, form, year):
         except: continue
     return feature_dict
 
-import json
-with open('./json/newSchema_10q.json','w') as f:
-    json.dump(get_data(1585521, "10-Q", 2020),f,indent=4)
+def get_metadata(cik):
+    data = dict()
+    token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
+    metadata_prop = {'vcard:organization-name': "CompanyName", 'hasURL': "URL", 'mdaas:HeadquartersAddress': "Address", 'tr-org:hasHeadquartersFaxNumber': "FaxNumber",
+                     'tr-org:hasHeadquartersPhoneNumber': "PhoneNumber", 'hasHoldingClassification': "HoldingType", 'hasIPODate': "IPODate"}
+    l = len(str(cik))
+    cik = "0"*(10-l)+str(cik)
+    perm_id = requests.get(
+        "https://api-eit.refinitiv.com/permid/search?q=cik:{}&access-token={}".format(cik, token))
+    perm_id_req = requests.get(perm_id.json()['result']['organizations']['entities'][0]['@id'], headers={
+                             "Accept": "application/ld+json", "x-ag-access-token": token})
+    perm_id_data = perm_id_req.json()
+    for prop in metadata_prop.keys():
+        try:
+            if prop == 'hasHoldingClassification':
+                if 'public' in perm_id_data[prop]:
+                    data[metadata_prop[prop]] = "Public"
+            elif prop == "mdaas:HeadquartersAddress":
+                data[metadata_prop[prop]] = perm_id_data[prop].replace("\n", " ")
+            else:
+                data[metadata_prop[prop]] = perm_id_data[prop]
+        except:
+            continue
+    for prop in metadata_prop.keys():
+        data[metadata_prop[prop]] = data.get(metadata_prop[prop], 'NaN')
+    return data
 
+
+# import json
+# with open('./json/newSchema_10q.json','w') as f:
+#     json.dump(get_data(1585521, "10-Q", 2020),f,indent=4)
 # print(get_data(1585521, "10-K", 2020))
