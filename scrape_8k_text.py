@@ -1,36 +1,8 @@
-from cgitb import text
-from operator import mod
-from telnetlib import EC
 from bs4 import BeautifulSoup
 import urllib3
-import re
 import requests
 import xml.etree.ElementTree as ET
 
-mod_to_orig = {
-    'Marketable securities': 'MarketableSecurities', 
-    'Inventories': 'Inventories',
-    'shares outstanding':'SharesOutstanding',
-    'Stock Price':'StockPrice',
-    'Sales Cost':'SalesCost', 
-    'Subscription Revenue' : 'SubscriptionRevenue',
-    'total operating expenses': 'TotalOperatingExpenses', 
-    'customer acquisition costs': 'CustomerAcquisitionCosts', 
-    'Customer churn': 'CustomerChurn', 
-    'revenue churn': 'RevenueChurn', 
-    'Revenues': 'Revenues', 
-    'Gross profit': 'GrossProfit', 
-    'MRR': 'MRR', 
-    'Total property and equipment': 'TotalPropertyAndEquipment', 
-    'net operating expenses': 'NetOperatingExpenses', 
-    'cost of sales': 'CostOfSales', 
-    'subscriber churn': 'SubscriberChurn', 
-    'GAAP Revenue': 'GAAPRevenue', 
-    'EBITDA': 'EBITDA',
-    'Non-GAAP Earnings': 'Non-GAAPEarnings', 
-    'Recurring Revenue': 'RecurringRevenue',
-    'operating income': 'OperatingIncome',
-    'ARR': 'ARR'}
 
 sentiment_features = ('$','%','unit','ten','hundred','thousand','million','billion','revenue','loss','profit',
                         'growth','potential','income','percent','customer')
@@ -138,5 +110,3 @@ def get_scrape_text(cik, form, datea, dateb):
             continue
 
     return final_sentences
-
-# get_scrape_text(1459417,"8-K","20210101","20220101")
