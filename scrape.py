@@ -79,7 +79,14 @@ def get_doc_url(cik, accn, form):
     reports = soup.find('inputfiles')
     file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
     doc_url = gen_url + file_name
-    return doc_url
+    reports = soup.find('myreports')
+    sec_tables = []
+    for report in reports.find_all('report')[:-1]:
+        sec_table = dict()
+        sec_table['name'] = report.shortname.text.replace(" ", "_")
+        sec_table['url'] = gen_url + report.htmlfilename.text
+        sec_tables.append(sec_table)
+    return (doc_url, sec_tables)
 
 def get_all_stock_price(cik):
     token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
@@ -174,10 +181,11 @@ def get_data(cik, form, year):
     stock_prices = get_all_stock_price(cik)
     for accn, date in accn_date_list:
         data = dict()
+        complete_data = dict()
         try:
             data["FilingDate"] = date
 
-            data["DocURL"] = get_doc_url(cik, accn, form)
+            data["DocURL"], filing_data = get_doc_url(cik, accn, form)
 
             req = http.request("GET",data["DocURL"],headers=headers)
             doc_soup = BeautifulSoup(req.data, features='lxml')
@@ -199,12 +207,14 @@ def get_data(cik, form, year):
                             break
 
             data = {**table_data, **text_data, **data}
+            complete_data["features"] = data
+            complete_data["sec_filing"] = filing_data
 
             if form=="10-Q":
-                feature_dict[f"{year}_{quarter}"] = data
+                feature_dict[f"{year}_{quarter}"] = complete_data
                 quarter -= 1 
             else:
-                feature_dict[f"{year}"] = data
+                feature_dict[f"{year}"] = complete_data
 
         except: continue
     return feature_dict
@@ -212,3 +222,5 @@ def get_data(cik, form, year):
 import json
 with open('./json/newSchema_10q.json','w') as f:
     json.dump(get_data(1585521, "10-Q", 2020),f,indent=4)
+
+# print(get_data(1585521, "10-K", 2020))
