@@ -2,15 +2,13 @@ import pandas as pd
 import scrape_8k_text
 import json
 from textblob import TextBlob
-import re
 
 companies = pd.read_csv("./csv/GoodCom.csv")
 
 ciks = companies["CIK"].astype(int).tolist()
 
-json_file_name = "data_8k_text_mihir_1.json" #name of json file obtained from bulk scraping
-lb = 130 #start of range
-ub = -1 #end of range
+
+json_file_name = "bulk_8k_data.json"
 
 years = [2022, 2021]
 
@@ -22,7 +20,7 @@ def mustHave(sentence):
 
 data_8k_text = dict()
 
-for cik in ciks[lb:]:
+for cik in ciks:
     year_dict = dict()
     
     for year in years:
