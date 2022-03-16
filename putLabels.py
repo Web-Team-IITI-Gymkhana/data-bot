@@ -1,6 +1,7 @@
 import pandas as pd
 from asyncio.windows_events import NULL
 from cmath import nan
+from cmath import isnan
 import json
  
 f = open('json/data_10k_table(dummy).json')
@@ -8,80 +9,102 @@ f = open('json/data_10k_table(dummy).json')
  
 data = json.load(f)
 
-def wce(r):
-  if r>=1.5 and r<=2:
-    return 1
-  else: 
-    return 0  
+def wce(r):  
+    if isnan(r)== True:
+        return float('nan') 
+    elif r>=1.5 and r<=2:
+        return 1
+    else: 
+        return 0  
 "================================================"
 def de(r):
-  if r>=0.5 and r<=1.5:
+  if isnan(r)== True:
+    return float('nan')    
+  elif r>=0.5 and r<=1.5:
     return 1
   else: 
     return 0 
 "================================================"
 def eps(r):
-  if r>=1 and r<=99:
-    return 1
-  else: 
-    return 0 
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>=1 and r<=99:
+        return 1
+    else: 
+        return 0 
 "================================================"
 def pe(r):
-  if r>13:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>13:
+        return 1
+    else: 
+        return 0
 "================================================"
 def roe(r):
-  if r>15:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>15:
+        return 1
+    else: 
+        return 0
 "================================================"
 def ro40(r):
-  if r>40:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan') 
+    elif r>40:
+        return 1
+    else: 
+        return 0
 "================================================"
 def market_cap(r):
-  if r>2000000000:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>2000000000:
+        return 1
+    else: 
+        return 0
 "================================================"
 def growth_rate(r):
-  if r>60:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan') 
+    elif r>60:
+        return 1
+    else: 
+        return 0
 "================================================"
 def profit_margin(r):
-  if r>20:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan') 
+    elif r>20:
+        return 1
+    else: 
+        return 0
 "================================================"
 def gross_margin(r):
-  if r>0.5:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>0.5:
+        return 1
+    else: 
+        return 0
 "================================================"
 def magic_num(r):
-  if r>1:
-    return 1
-  else: 
-    return 0
+    if isnan(r)== True:
+        return float('nan')  
+    elif r>1:
+        return 1
+    else: 
+        return 0
 "================================================"
 def chun_rate(r):
-  try:
-    if r<1:
+    if isnan(r)== True:
+        return float('nan') 
+    elif r<1:
       return 1
     else: 
       return 0
-  except:
-    return 0  
+
 
 "=============================================="
 '''
@@ -207,8 +230,9 @@ for cik in data:
       rato['churnrate_label']=rato['ChurnRate'].apply(chun_rate)
       rato['marketCap_label']=rato['MarketCap'].apply(market_cap)
       rato['magicNum_label']=rato['MagicNumber'].apply(magic_num)
-
-      print(rato.iloc[:,-9:])
+      rato['Average']=rato.iloc[:,-12:].mean(axis=0,skipna=True)
+      print(rato.iloc[:,-5:])
+      print(rato['Average'])
     break
 
 
