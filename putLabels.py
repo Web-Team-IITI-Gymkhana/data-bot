@@ -3,6 +3,7 @@ from asyncio.windows_events import NULL
 from cmath import nan
 from cmath import isnan
 import json
+import numpy as np
  
 f = open('json/data_10k_table(dummy).json')
 
@@ -11,7 +12,7 @@ data = json.load(f)
 
 def wce(r):  
     if isnan(r)== True:
-        return float('nan') 
+        return np.float64('nan') 
     elif r>=1.5 and r<=2:
         return 1
     else: 
@@ -19,7 +20,7 @@ def wce(r):
 "================================================"
 def de(r):
   if isnan(r)== True:
-    return float('nan')    
+    return np.float64('nan')    
   elif r>=0.5 and r<=1.5:
     return 1
   else: 
@@ -27,7 +28,7 @@ def de(r):
 "================================================"
 def eps(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>=1 and r<=99:
         return 1
     else: 
@@ -35,7 +36,7 @@ def eps(r):
 "================================================"
 def pe(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>13:
         return 1
     else: 
@@ -43,7 +44,7 @@ def pe(r):
 "================================================"
 def roe(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>15:
         return 1
     else: 
@@ -51,7 +52,7 @@ def roe(r):
 "================================================"
 def ro40(r):
     if isnan(r)== True:
-        return float('nan') 
+        return np.float64('nan') 
     elif r>40:
         return 1
     else: 
@@ -59,7 +60,7 @@ def ro40(r):
 "================================================"
 def market_cap(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>2000000000:
         return 1
     else: 
@@ -67,7 +68,7 @@ def market_cap(r):
 "================================================"
 def growth_rate(r):
     if isnan(r)== True:
-        return float('nan') 
+        return np.float64('nan') 
     elif r>60:
         return 1
     else: 
@@ -75,7 +76,7 @@ def growth_rate(r):
 "================================================"
 def profit_margin(r):
     if isnan(r)== True:
-        return float('nan') 
+        return np.float64('nan') 
     elif r>20:
         return 1
     else: 
@@ -83,7 +84,7 @@ def profit_margin(r):
 "================================================"
 def gross_margin(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>0.5:
         return 1
     else: 
@@ -91,7 +92,7 @@ def gross_margin(r):
 "================================================"
 def magic_num(r):
     if isnan(r)== True:
-        return float('nan')  
+        return np.float64('nan')  
     elif r>1:
         return 1
     else: 
@@ -99,7 +100,7 @@ def magic_num(r):
 "================================================"
 def chun_rate(r):
     if isnan(r)== True:
-        return float('nan') 
+        return np.float64('nan') 
     elif r<1:
       return 1
     else: 
@@ -140,10 +141,18 @@ for cik in data:
       cur = data[cik][dt]
 
       for keys in cur:
-        cur[keys] = float(cur[keys]) + epsilon
+        try:
+          cur[keys] = np.float64(cur[keys])
+        except:
+          if isnan(cur[keys])== True:
+            cur[keys] = np.float64('nan')
       
       for keys in prev:
-        prev[keys] = float(prev[keys]) + epsilon
+        try:
+          prev[keys] = np.float64(prev[keys])
+        except:
+          if isnan(prev[keys])== True:
+            prev[keys] = np.float64('nan')
 
       cur['ARR'] = (cur['MRR'] * 12)
       prev['ARR'] = (prev['MRR'] * 12)

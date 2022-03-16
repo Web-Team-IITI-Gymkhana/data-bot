@@ -1,86 +1,113 @@
-from operator import index
 import pandas as pd
+from asyncio.windows_events import NULL
+from cmath import nan
+from cmath import isnan
+import json
+import numpy as np
 
 class ideal_extract:
-  def wce(self, r):
-    if r>=1 and r<=2:
-      return 1
-    else: 
-      return 0  
+  def wce(self, r):  
+      if isnan(r)== True:
+          return np.float64('nan') 
+      elif r>=1.5 and r<=2:
+          return 1
+      else: 
+          return 0  
   "================================================"
   def de(self, r):
-    if r>=0.5 and r<=1.5:
+    if isnan(r)== True:
+      return np.float64('nan')    
+    elif r>=0.5 and r<=1.5:
       return 1
     else: 
       return 0 
   "================================================"
   def eps(self, r):
-    if r>=1 and r<=99:
-      return 1
-    else: 
-      return 0 
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>=1 and r<=99:
+          return 1
+      else: 
+          return 0 
   "================================================"
   def pe(self, r):
-    if r>13:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>13:
+          return 1
+      else: 
+          return 0
   "================================================"
   def roe(self, r):
-    if r>15:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>15:
+          return 1
+      else: 
+          return 0
   "================================================"
   def ro40(self, r):
-    if r>40:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan') 
+      elif r>40:
+          return 1
+      else: 
+          return 0
   "================================================"
   def market_cap(self, r):
-    if r>2000000000:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>2000000000:
+          return 1
+      else: 
+          return 0
   "================================================"
   def growth_rate(self, r):
-    if r>60:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan') 
+      elif r>60:
+          return 1
+      else: 
+          return 0
   "================================================"
   def profit_margin(self, r):
-    if r>20:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan') 
+      elif r>20:
+          return 1
+      else: 
+          return 0
   "================================================"
   def gross_margin(self, r):
-    if r>0.5:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>0.5:
+          return 1
+      else: 
+          return 0
   "================================================"
   def magic_num(self, r):
-    if r>1:
-      return 1
-    else: 
-      return 0
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r>1:
+          return 1
+      else: 
+          return 0
   "================================================"
   def chun_rate(self, r):
-    try:
-      if r<1:
+      if isnan(r)== True:
+          return np.float64('nan') 
+      elif r<1:
         return 1
       else: 
         return 0
-    except:
-      return 0  
 
   "================================================"
   def ev_ebidta(self, r):
     try:
-      if r<10:
+      if isnan(r)== True:
+          return np.float64('nan')  
+      elif r<10:
         return 1
       else: 
         return 0
@@ -89,18 +116,25 @@ class ideal_extract:
 
 class ratios:
   def setup_ratios(cur, prev):
-      epsilon = 1e-20
       for keys in cur:
         try:
-          cur[keys] = float(cur[keys]) + epsilon
+          cur[keys] = np.float64(cur[keys])
         except:
-          pass
+          try:
+            if isnan(cur[keys])== True:
+              cur[keys] = np.float64('nan')
+          except:
+            pass
       
       for keys in prev:
         try:
-          prev[keys] = float(prev[keys]) + epsilon
+          prev[keys] = np.float64(prev[keys])
         except:
-          pass
+          try:
+            if isnan(prev[keys])== True:
+              prev[keys] = np.float64('nan')
+          except:
+            pass
 
       cur['ARR'] = (cur['MRR'] * 12)
       cur['ARR'] = (cur['NetIncome'])
