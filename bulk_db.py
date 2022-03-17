@@ -1,5 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
+import json
 import pandas as pd
 import scrape
 
@@ -24,4 +25,13 @@ def bulk():
         for filing10q in _10q.keys():
             db.collection("company").document(str(cik)).collection("_10q").document(filing10q).set(_10q[filing10q])  
         print(f"{cik} DONE")
-bulk()
+# bulk()
+
+def bulk_8k():
+    with open('bulk_res (1).json', 'r') as f:
+        data = json.load(f)
+    for cik in data.keys():
+        for year in data[cik].keys():
+            db.collection("company").document(str(cik)).collection("_8k").document(str(year)).set(data[cik][year])
+
+bulk_8k()
