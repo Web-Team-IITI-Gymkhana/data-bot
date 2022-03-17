@@ -88,21 +88,6 @@ def get_doc_url(cik, accn, form):
         sec_tables.append(sec_table)
     return (doc_url, sec_tables)
 
-def get_all_stock_price(cik):
-    token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
-    l = len(str(cik))
-    cik = "0"*(10-l)+str(cik)
-    perm_id = requests.get(
-        "https://api-eit.refinitiv.com/permid/search?q=cik:{}&access-token={}".format(cik, token))
-    perm_id_req = requests.get(perm_id.json()['result']['organizations']['entities'][0]['@id'], headers={
-                             "Accept": "application/ld+json", "x-ag-access-token": token})
-    quote_detail = requests.get(perm_id_req.json()["hasOrganizationPrimaryQuote"], headers={"Accept": "application/ld+json", "x-ag-access-token": token})
-    ticker = quote_detail.json()["tr-fin:hasExchangeTicker"]
-    alpha_token = "XZVMA05SP371BARG"
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol={ticker}&apikey={alpha_token}'
-    data_req = requests.get(url)
-    return data_req.json()['Monthly Time Series']
-
 def get_text_data(doc_soup):
     text_data = dict()
     for text_feature in text_features.keys():
@@ -148,7 +133,7 @@ def get_text_data(doc_soup):
             text_data[text_feature] = text_data.get(text_feature,"NaN")
     return text_data
 
-def get_table_data(doc_soup, year, form):
+def get_table_data(doc_soup, year, form, spec=0):
     if form == "10-K":
         year +=1
     table_data = dict()
@@ -156,18 +141,87 @@ def get_table_data(doc_soup, year, form):
         try:            
             value = doc_soup.find_all("ix:nonfraction", {"name": features[feature]})
             values = []
-            for i in value:
+            for i in value:               
                 try:
-                    if str(year) in i["contextref"]:    
-                        if i.has_attr("sign"):
-                            values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
-                        else:
-                            values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
-                    elif str(year-1) in i["contextref"]: 
-                        if i.has_attr("sign"):
-                            values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
-                        else:
-                            values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                    if spec==0:
+                        if str(year) in i["contextref"]:    
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i.text.replace(",","")))
+                        elif str(year-1) in i["contextref"]: 
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i.text.replace(",","")))
+                        elif str(year+1) in i["contextref"]: 
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(+i.text.replace(",","")))
+                    else:
+                        if spec.replace("-","") in i["contextref"].replace("-",""):    
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i.text.replace(",","")))
+                        elif str(year) in i["contextref"]:    
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i.text.replace(",","")))
+                        elif str(year-1) in i["contextref"]: 
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i.text.replace(",","")))
+                        elif str(year+1) in i["contextref"]: 
+                            if i.has_attr("sign"):
+                                if i.has_attr("scale"):
+                                    values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(i["sign"]+i.text.replace(",","")))
+                            else:
+                                if i.has_attr("scale"):
+                                    values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
+                                else:
+                                    values.append(float(+i.text.replace(",","")))
                 except:
                     continue
             if len(values)!=0:
@@ -178,29 +232,54 @@ def get_table_data(doc_soup, year, form):
             continue
     return table_data
 
-def get_metadata(cik):
+def get_meta_stock(cik):
     data = dict()
-    token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
-    metadata_prop = {'vcard:organization-name': "CompanyName", 'hasURL': "URL", 'mdaas:HeadquartersAddress': "Address", 'tr-org:hasHeadquartersFaxNumber': "FaxNumber",
-                     'tr-org:hasHeadquartersPhoneNumber': "PhoneNumber", 'hasHoldingClassification': "HoldingType", 'hasIPODate': "IPODate"}
-    l = len(str(cik))
-    cik = "0"*(10-l)+str(cik)
-    perm_id = requests.get(
-        "https://api-eit.refinitiv.com/permid/search?q=cik:{}&access-token={}".format(cik, token))
-    perm_id_req = requests.get(perm_id.json()['result']['organizations']['entities'][0]['@id'], headers={
-                             "Accept": "application/ld+json", "x-ag-access-token": token})
-    perm_id_data = perm_id_req.json()
-    for prop in metadata_prop.keys():
-        try:
-            if prop == 'hasHoldingClassification':
-                if 'public' in perm_id_data[prop]:
-                    data[metadata_prop[prop]] = "Public"
-            elif prop == "mdaas:HeadquartersAddress":
-                data[metadata_prop[prop]] = perm_id_data[prop].replace("\n", " ")
+    stock_data = dict()
+    try:
+        token = "OPFbGvwobBxjrx0M6MSWMMvFgtz7DKKp"
+        metadata_prop = {'vcard:organization-name': "CompanyName", 'hasURL': "URL", 'mdaas:HeadquartersAddress': "Address", 'tr-org:hasHeadquartersFaxNumber': "FaxNumber",
+                        'tr-org:hasHeadquartersPhoneNumber': "PhoneNumber", 'hasHoldingClassification': "HoldingType", 'hasIPODate': "IPODate"}
+        l = len(str(cik))
+        cik = "0"*(10-l)+str(cik)
+        perm_id = requests.get("https://api-eit.refinitiv.com/permid/search?q=cik:{}&access-token={}".format(cik, token))
+        if len(perm_id.json()['result']['organizations']['entities'])>0:
+            perm_id_req = requests.get(perm_id.json()['result']['organizations']['entities'][0]['@id'], headers={
+                                    "Accept": "application/ld+json", "x-ag-access-token": token})
+            perm_data = perm_id_req.json()
+            if "hasOrganizationPrimaryQuote" in perm_data.keys():
+                quote_detail = requests.get(perm_data["hasOrganizationPrimaryQuote"], headers={"Accept": "application/ld+json", "x-ag-access-token": token})
+                ticker = quote_detail.json()["tr-fin:hasExchangeTicker"]
+                exchange = quote_detail.json()['tr-fin:hasExchangeCode']
+                data["ticker"] = ticker
+                data["exchange"] = exchange
+                alpha_token = "XZVMA05SP371BARG"
+                url = f'https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol={ticker}&apikey={alpha_token}'
+                data_req = requests.get(url)
+                stock_data = data_req.json()['Monthly Time Series']
+                for prop in metadata_prop.keys():
+                    try:
+                        if prop == 'hasHoldingClassification':
+                            if 'public' in perm_data[prop]:
+                                data[metadata_prop[prop]] = "Public"
+                        elif prop == "mdaas:HeadquartersAddress":
+                            data[metadata_prop[prop]] = perm_data[prop].replace("\n", " ")
+                        else:
+                            data[metadata_prop[prop]] = perm_data[prop]
+                    except:
+                        continue
+                for prop in metadata_prop.keys():
+                    data[metadata_prop[prop]] = data.get(metadata_prop[prop], 'NaN') 
             else:
-                data[metadata_prop[prop]] = perm_id_data[prop]
-        except:
-            continue
-    for prop in metadata_prop.keys():
-        data[metadata_prop[prop]] = data.get(metadata_prop[prop], 'NaN')
-    return data
+                for prop in metadata_prop.keys():
+                    data[metadata_prop[prop]] = data.get(metadata_prop[prop], 'NaN') 
+                data["ticker"] = "NaN"
+                data["exchange"] = "NaN"
+        else:
+            for prop in metadata_prop.keys():
+                data[metadata_prop[prop]] = data.get(metadata_prop[prop], 'NaN') 
+            data["ticker"] = "NaN"
+            data["exchange"] = "NaN"
+    except:
+        data = dict()
+        stock_data = dict()
+    return (data, stock_data)
