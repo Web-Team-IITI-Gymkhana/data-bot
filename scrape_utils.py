@@ -44,12 +44,23 @@ headers = {
 
 http = urllib3.PoolManager()
 
+
+##########################################################################
+"""
+get_accn function takes in the CIK of a company, the form type(10-K, 10-Q)
+and the year.
+It then searches for all the filings of the defined type with 
+the range {year}/01/01-{year+1}/01/01 (YYYY/MM/DD) and returns the
+accession number and the date of filing for each filing.
+"""
+
+
 def get_accn(cik, form, year):
     if form=="10-K":
         year = year+1
 
-    endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"
-    param = {'action': 'getcompany',
+    endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"       #endpoint of the search
+    param = {'action': 'getcompany',                            #parameter of the search
             'CIK': cik,
             'type': form,
             'dateb': f"{year+1}0101",
@@ -58,11 +69,11 @@ def get_accn(cik, form, year):
             'output': 'atom',
             'count': '100',
         }
-    response = requests.get(url=endpoint, params=param, headers=headers)
-    tree = ET.ElementTree(ET.fromstring(response.text))
+    response = requests.get(url=endpoint, params=param, headers=headers)    #It sends a get request with the defined parameter and headers
+    tree = ET.ElementTree(ET.fromstring(response.text))                     
     root = tree.getroot()
     accn_date_list = []
-    for child in root.findall("{http://www.w3.org/2005/Atom}entry"):
+    for child in root.findall("{http://www.w3.org/2005/Atom}entry"):        # Search for all the filing entries
         try:   
             accn = child.find("{http://www.w3.org/2005/Atom}content").find("{http://www.w3.org/2005/Atom}accession-number").text.replace("-", "")
             date = child.find("{http://www.w3.org/2005/Atom}content").find("{http://www.w3.org/2005/Atom}filing-date").text
@@ -70,23 +81,46 @@ def get_accn(cik, form, year):
         except: continue
     return accn_date_list
 
+
+##########################################################################
+"""
+get_doc_url function takes in the CIK of a company, the accession number of
+the filing and the form type(10-K, 10-Q). 
+It then searches inside the FilingSummary.xml file for the filing document
+and also searches for the Individual Reports of the SEC filing.
+It returns the url of the filing document and a list of all the 
+Individual Report Names and their URLs.
+"""
+
+
 def get_doc_url(cik, accn, form):
     base_url = "https://www.sec.gov/Archives/edgar/data/"
-    gen_url = base_url + "{}/{}/".format(cik, accn)
+    gen_url = base_url + "{}/{}/".format(cik, accn)                     # URL for the SEC filing directory
     xml_summary = gen_url + "FilingSummary.xml"
     content = requests.get(xml_summary, headers=headers).content
     soup = BeautifulSoup(content, features='lxml')
     reports = soup.find('inputfiles')
     file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
-    doc_url = gen_url + file_name
+    doc_url = gen_url + file_name                                       # SEC filing document URL
     reports = soup.find('myreports')
     sec_tables = []
     for report in reports.find_all('report')[:-1]:
         sec_table = dict()
         sec_table['name'] = report.shortname.text.replace(" ", "_")
         sec_table['url'] = gen_url + report.htmlfilename.text
-        sec_tables.append(sec_table)
+        sec_tables.append(sec_table)                                    # Appends a map of the name and url of the individual report to the list
     return (doc_url, sec_tables)
+
+
+##########################################################################
+"""
+get_text_data function takes in the CIK of a company, the accession number of
+the filing and the form type(10-K, 10-Q). 
+It then searches inside the FilingSummary.xml file for the filing document
+and also searches for the Individual Reports of the SEC filing.
+It returns the url of the filing document and a list of all the 
+Individual Report Names and their URLs.
+"""
 
 def get_text_data(doc_soup):
     text_data = dict()
@@ -132,6 +166,10 @@ def get_text_data(doc_soup):
         for text_feature in text_features.keys():
             text_data[text_feature] = text_data.get(text_feature,"NaN")
     return text_data
+
+
+##########################################################################
+
 
 def get_table_data(doc_soup, year, form, spec=0):
     if form == "10-K":
@@ -231,6 +269,10 @@ def get_table_data(doc_soup, year, form, spec=0):
         except:
             continue
     return table_data
+
+
+##########################################################################
+
 
 def get_meta_stock(cik):
     data = dict()

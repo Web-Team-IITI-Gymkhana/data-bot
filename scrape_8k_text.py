@@ -5,17 +5,24 @@ import xml.etree.ElementTree as ET
 
 
 sentiment_features = ('$','%','unit','ten','hundred','thousand','million','billion','revenue','loss','profit',
-                        'growth','potential','income','percent','customer')
+                        'growth','potential','income','percent','customer') #List of keywords used in order to extract the text from 8K forms
 
 headers = {
     'user-agent': 'Sample @ <sample@sample.com>',
     'host': 'www.sec.gov'
 }
 
-def get_scrape_text(cik, form, datea, dateb):
-    final_sentences = []
+##########################################################################
+'''In this function, we scrape the SEC Edgar database for a given company
+and for a given date range and obtain all the 8K forms filed by this company
+within this date range. We then use a list of keywords in order to select specific parts of the 
+text that may provide a significant amount of financial information about the company
+'''
 
-    endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"
+def get_scrape_text(cik, form, datea, dateb):
+    final_sentences = [] #stores the final list of extracted sentences
+
+    endpoint = "https://www.sec.gov/cgi-bin/browse-edgar" #url of endpoint for performing the search
     base_url = "https://www.sec.gov/Archives/edgar/data/"
     param = {'action': 'getcompany',
             'CIK': cik,
@@ -26,16 +33,17 @@ def get_scrape_text(cik, form, datea, dateb):
             'output': 'atom',
             'count': '100',
             }
-    response = requests.get(url=endpoint, params=param, headers=headers)
+    
+    response = requests.get(url=endpoint, params=param, headers=headers) 
     tree = ET.ElementTree(ET.fromstring(response.text))
     root = tree.getroot()
     for child in root.findall("{http://www.w3.org/2005/Atom}entry"):
         try:   
             accn = (child.find("{http://www.w3.org/2005/Atom}content")
                     ).find("{http://www.w3.org/2005/Atom}accession-number").text
-            gen_url = base_url + "{}/{}/".format(cik, accn.replace("-", ""))
+            gen_url = base_url + "{}/{}/".format(cik, accn.replace("-", "")) 
             xml_summary = gen_url + "FilingSummary.xml"
-            content = requests.get(xml_summary, headers=headers).content
+            content = requests.get(xml_summary, headers=headers).content  
             soup = BeautifulSoup(content, features='lxml')
             reports = soup.find('inputfiles')
             file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
@@ -44,27 +52,30 @@ def get_scrape_text(cik, form, datea, dateb):
             req = http.request("GET",doc_url,headers=headers)
             docsoup = BeautifulSoup(req.data, features='lxml')
 
-            text_tags = docsoup.find_all(["span", "p","font","li"])
-            anchor_tags = docsoup.find_all(["a"])
+            text_tags = docsoup.find_all(["span", "p","font","li"]) #Extract all the tags which contain text in the form
+            anchor_tags = docsoup.find_all(["a"]) #This is used to extract the link of a press release issued by the company
 
 
             for tag in text_tags:  
+                #This loops through all the tags which may contain textual data in the form
                 try:
                     txt = tag.text.lower()
                     
-                    if len(txt.split(' '))<=5:
+                    if len(txt.split(' '))<=5: #Short sentences are ignored
                         continue
 
                     valid = False
-                    for feature in sentiment_features:
+                    for feature in sentiment_features: #We check if the extracted text contains any keyword from the list defined above
                         if feature in txt:
                             valid = True
                             break
 
-                    if 'check mark' in txt:
+
+                    if 'check mark' in txt: 
                         valid = False
                     
-                    if valid==True:
+                    #Now we have validated the sentence, hence we put it into the list of final sentences
+                    if valid==True: 
                         txt = txt.encode("utf-8")
                         txt = txt.decode("utf-8","ignore")
                         final_sentences.append(txt)
@@ -73,20 +84,26 @@ def get_scrape_text(cik, form, datea, dateb):
                     continue
 
             for anchor_tag in anchor_tags:
+                #Checks all the anchor tags in the form to see if the company has provided a link to its press release
                 try:
                     txt = anchor_tag.text.lower()
                     if ('press' in txt) and ('release' in txt):
-                        press_release_filename = anchor_tag['href']
+                        #We have found a section of the form containing details about a press release
+                        press_release_filename = anchor_tag['href'] #We extract the link of the press releaase
                         press_release_url = gen_url + press_release_filename
                         pr_req = http.request("GET",press_release_url,headers=headers)
                         press_release_docsoup = BeautifulSoup(pr_req.data, features='lxml')
                         press_release_text_tags = press_release_docsoup.find_all(["span", "p","font","li"])
 
+                        #We obtain the press release document from the obtained link and then extract the 
+                        #text tags from this document, similar to what we did for the text tags in the 
+                        #8k filing document
+
                         for tag in press_release_text_tags:
                             
                             txt = tag.text.lower()
 
-                            if len(txt.split(' '))<=5:
+                            if len(txt.split(' '))<=5: #Short sentences are ignored
                                 continue
 
                             valid = False
