@@ -11,6 +11,17 @@ import sys
 import pandas as pd
 import json
 
+#below functions are designed to generate labels or categories Profitablity ratios and 
+# metrics on the basis of investability 
+#Ideal Ranges of each ratios and metrics are taken on the basis of theoretical / technical 
+#perspective generally used by investors
+# labels generated in form of 0 or 1 or Nan: where 
+      # 0 denotes bad Metrics or Ratio value for investment
+      # 1 denotes goog ratio value for investment
+      # Nan denotes data insufficency that is data not published by company
+
+##Functions
+#1. Working Capital ratios  1.5=<r<=2
 def wce(r):  
     if isnan(r)== True:
         return float('nan') 
@@ -19,6 +30,7 @@ def wce(r):
     else: 
         return 0  
 "================================================"
+#2. Debt to Equity ratios  0.5=<r<=1.5
 def de(r):
   if isnan(r)== True:
     return float('nan')    
@@ -27,6 +39,7 @@ def de(r):
   else: 
     return 0 
 "================================================"
+#3. Earning per Share  1=<r<=99
 def eps(r):
     if isnan(r)== True:
         return float('nan')  
@@ -35,6 +48,7 @@ def eps(r):
     else: 
         return 0 
 "================================================"
+#4. price-earning ratio::P/E ratio: r>13
 def pe(r):
     if isnan(r)== True:
         return float('nan')  
@@ -43,6 +57,7 @@ def pe(r):
     else: 
         return 0
 "================================================"
+#5. Return of Equity:r>15
 def roe(r):
     if isnan(r)== True:
         return float('nan')  
@@ -51,6 +66,7 @@ def roe(r):
     else: 
         return 0
 "================================================"
+#6. Rule of 40:r>40
 def ro40(r):
     if isnan(r)== True:
         return float('nan') 
@@ -59,6 +75,7 @@ def ro40(r):
     else: 
         return 0
 "================================================"
+#7. Market Capitalization: r> $2Billion
 def market_cap(r):
     if isnan(r)== True:
         return float('nan')  
@@ -67,6 +84,7 @@ def market_cap(r):
     else: 
         return 0
 "================================================"
+#8. Growth Rate:r>60%
 def growth_rate(r):
     if isnan(r)== True:
         return float('nan') 
@@ -75,6 +93,7 @@ def growth_rate(r):
     else: 
         return 0
 "================================================"
+#9. Profit Margin:r>20
 def profit_margin(r):
     if isnan(r)== True:
         return float('nan') 
@@ -83,6 +102,7 @@ def profit_margin(r):
     else: 
         return 0
 "================================================"
+#10. Gross Margin:r>0.5
 def gross_margin(r):
     if isnan(r)== True:
         return float('nan')  
@@ -91,6 +111,7 @@ def gross_margin(r):
     else: 
         return 0
 "================================================"
+#11. Magic Number: r>1
 def magic_num(r):
     if isnan(r)== True:
         return float('nan')  
@@ -99,6 +120,7 @@ def magic_num(r):
     else: 
         return 0
 "================================================"
+#12. Churn Rate:r<1
 def chun_rate(r):
     if isnan(r)== True:
         return float('nan') 
