@@ -5,7 +5,7 @@ from textblob import TextBlob
 
 companies = pd.read_csv("./csv/GoodCom.csv")
 
-ciks = companies["CIK"].astype(int).tolist()
+ciks = companies["CIK"].astype(int).tolist() #Get the list of all ciks
 
 
 json_file_name = "bulk_8k_data.json"
@@ -29,9 +29,9 @@ for cik in ciks:
             sentences = scrape_8k_text.get_scrape_text(cik, "8-K", f"{year-1}0101", f"{year}0101")
             chosen = []
             for sentence in sentences:
-                result = TextBlob(sentence).sentiment
-                subjectivity = result.subjectivity
-                if subjectivity>=0.4 and mustHave(sentence):
+                result = TextBlob(sentence).sentiment 
+                subjectivity = result.subjectivity #We find the subjectivity of the sentnce
+                if subjectivity>=0.4 and mustHave(sentence): #If the subjectivity of the sentence is above a certain threshold, we append it to the list of final sentences
                     sentence = sentence.capitalize()
                     chosen.append(sentence)
             
