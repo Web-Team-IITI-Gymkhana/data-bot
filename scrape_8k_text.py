@@ -34,20 +34,20 @@ def get_scrape_text(cik, form, datea, dateb):
             'count': '100',
             }
     
-    response = requests.get(url=endpoint, params=param, headers=headers) 
+    response = requests.get(url=endpoint, params=param, headers=headers)  #It sends a get request with the defined parameter and headers
     tree = ET.ElementTree(ET.fromstring(response.text))
     root = tree.getroot()
-    for child in root.findall("{http://www.w3.org/2005/Atom}entry"):
+    for child in root.findall("{http://www.w3.org/2005/Atom}entry"): # Search for all the filing entries
         try:   
             accn = (child.find("{http://www.w3.org/2005/Atom}content")
                     ).find("{http://www.w3.org/2005/Atom}accession-number").text
-            gen_url = base_url + "{}/{}/".format(cik, accn.replace("-", "")) 
-            xml_summary = gen_url + "FilingSummary.xml"
+            gen_url = base_url + "{}/{}/".format(cik, accn.replace("-", ""))  # URL for the SEC filing directory
+            xml_summary = gen_url + "FilingSummary.xml" 
             content = requests.get(xml_summary, headers=headers).content  
             soup = BeautifulSoup(content, features='lxml')
             reports = soup.find('inputfiles')
             file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
-            doc_url = gen_url + file_name
+            doc_url = gen_url + file_name  # SEC filing document URL
             http = urllib3.PoolManager()
             req = http.request("GET",doc_url,headers=headers)
             docsoup = BeautifulSoup(req.data, features='lxml')
@@ -100,14 +100,14 @@ def get_scrape_text(cik, form, datea, dateb):
                         #8k filing document
 
                         for tag in press_release_text_tags:
-                            
+                            #This loops through all the tags which may contain textual data in the press release
                             txt = tag.text.lower()
 
                             if len(txt.split(' '))<=5: #Short sentences are ignored
                                 continue
 
                             valid = False
-                            for feature in sentiment_features:
+                            for feature in sentiment_features:  #We check if the extracted text contains any keyword from the list defined above
                                 if feature in txt:
                                     valid = True
                                     break
@@ -115,6 +115,7 @@ def get_scrape_text(cik, form, datea, dateb):
                             if 'check mark' in txt:
                                 valid = False
                             
+                            #Now we have validated the sentence, hence we put it into the list of final sentences
                             if valid==True:
                                 txt = txt.encode("utf-8")
                                 txt = txt.decode("utf-8","ignore")
