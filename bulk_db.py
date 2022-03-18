@@ -3,6 +3,9 @@ from firebase_admin import credentials, firestore
 import json
 import pandas as pd
 import scrape
+import time
+
+start_time = time.time()
 
 
 ##########################################################################
@@ -45,7 +48,7 @@ with open('8K_Text_Sentiment.json', 'r') as f:
         data_8k = json.load(f)
 
 def bulk():
-    for cik in ciks[20:30]:
+    for cik in ciks[0:1]:
         data = scrape.get_data(cik)
         _10k = data.pop("_10k")
         _10q = data.pop("_10q")
@@ -70,3 +73,5 @@ bulk()
 
 
 #########################################################################
+
+print(f"{time.time()-start_time} seconds")

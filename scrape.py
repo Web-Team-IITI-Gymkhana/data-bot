@@ -15,12 +15,12 @@ The http variable creates a urllib3 PoolManager to efficiently run all the reque
 """
 
 
-http = urllib3.PoolManager()
-
 headers = {
     'user-agent': 'Sample @ <sample@sample.com>',
     'host': 'www.sec.gov'
 }
+
+http = urllib3.PoolManager()
 
 
 ##########################################################################
@@ -32,12 +32,12 @@ company, then for each form type in each year it calls the
 get_accn function, with that it gets accession number and date of
 filings. Then for each accession number it calls the get_doc_url
 function to get the Filing Document URL and Individual Reports.
-It then uses Beautiful Soup to parse the HTM document and finds in
-Filing for Date in the document. If it finds it tries to parse the 
-date in YYYY-MM-DD format and then sends it in the get_table_data
-as the spec parameter. If the parsing is not successful it saves the 
-unparsed date or if the date is not found get_table_data is called
-without spec parameter. It then calls the get_text_data function. 
+It then uses Beautiful Soup to parse the HTM or XML document according
+to the parse_method value and finds in Filing for Date in the document.
+If it finds it tries to parse the date in YYYY-MM-DD format and then sends
+it in the get_table_data as the spec parameter. If the parsing is not
+successful it saves the unparsed date or if the date is not found get_table_data
+is called without spec parameter. It then calls the get_text_data function. 
 If the Stock price is not found in the filing report and stock_prices
 is returned by the get_meta_stock function, it finds the stock price 
 through that data. It then binds the complete data and returns it in the 
@@ -47,7 +47,7 @@ through that data. It then binds the complete data and returns it in the
 
 def get_data(cik):
     meta_data, stock_prices = scrape_utils.get_meta_stock(cik)
-    years = [2021,2020,2019]
+    years = [2022,2021,2020,2019]
     forms = {"10-K": "_10k", "10-Q" : "_10q"}
     form_data = dict()
     for form in forms.keys():
@@ -61,25 +61,27 @@ def get_data(cik):
                         data = dict()
                         complete_data = dict()
                         try:
-                            
                             complete_data["FilingDate"] = date
-                            complete_data["DocURL"], filing_data = scrape_utils.get_doc_url(cik, accn, form)
+                            complete_data["DocURL"], filing_data, parse_method = scrape_utils.get_doc_url(cik, accn, form)
 
                             req = http.request("GET",complete_data["DocURL"],headers=headers)
                             doc_soup = BeautifulSoup(req.data, features='lxml')
-                            
-                            filing_for_date_tag = doc_soup.find_all("ix:nonnumeric", {"name": "dei:DocumentPeriodEndDate"})
+
+                            if parse_method=="htm":
+                                filing_for_date_tag = doc_soup.find_all("ix:nonnumeric", {"name": "dei:DocumentPeriodEndDate"})
+                            else:
+                                filing_for_date_tag = doc_soup.find_all(re.compile("dei:DocumentPeriodEndDate", re.I))
                             if len(filing_for_date_tag)>0:
                                 try:
                                     date_text = filing_for_date_tag[0].text.replace("&nbsp;", " ")
                                     complete_data["FilingForDate"] = parser.parse(date_text).strftime('%Y-%m-%d')
-                                    table_data = scrape_utils.get_table_data(doc_soup, year, form, complete_data["FilingForDate"])
+                                    table_data = scrape_utils.get_table_data(doc_soup, year, form, parse_method, complete_data["FilingForDate"])
                                 except:
                                     complete_data["FilingForDate"] = filing_for_date_tag[0].text
-                                    table_data = scrape_utils.get_table_data(doc_soup, year, form)
+                                    table_data = scrape_utils.get_table_data(doc_soup, year, form, parse_method)
                             else:
                                 complete_data["FilingForDate"] = "NaN"
-                                table_data = scrape_utils.get_table_data(doc_soup, year, form)
+                                table_data = scrape_utils.get_table_data(doc_soup, year, form, parse_method)
                             
                             text_data = scrape_utils.get_text_data(doc_soup)
 
@@ -107,6 +109,12 @@ def get_data(cik):
                                         except: continue
 
                             data = {**table_data, **text_data, **data}
+                            threshold = 0
+                            for data_feature in data.keys():
+                                if data[data_feature]=="NaN":
+                                    threshold+=1
+                            if threshold>=23:
+                                continue
                             complete_data["features"] = data
                             complete_data["sec_filing"] = filing_data
                             

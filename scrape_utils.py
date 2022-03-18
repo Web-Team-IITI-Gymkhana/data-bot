@@ -84,8 +84,6 @@ accession number and the date of filing for each filing.
 
 
 def get_accn(cik, form, year):
-    if form=="10-K":
-        year = year+1
 
     endpoint = "https://www.sec.gov/cgi-bin/browse-edgar"       #endpoint of the search
     param = {'action': 'getcompany',                            #parameter of the search
@@ -115,6 +113,7 @@ def get_accn(cik, form, year):
 get_doc_url function takes in the CIK of a company, the accession number of
 the filing and the form type(10-K, 10-Q). 
 It then searches inside the FilingSummary.xml file for the filing document
+and sets the parse_method to htm or xml according to filing document format
 and also searches for the Individual Reports of the SEC filing.
 
 It returns the url of the filing document and a list of all the 
@@ -128,9 +127,17 @@ def get_doc_url(cik, accn, form):
     xml_summary = gen_url + "FilingSummary.xml"
     content = requests.get(xml_summary, headers=headers).content
     soup = BeautifulSoup(content, features='lxml')
-    reports = soup.find('inputfiles')
-    file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
-    doc_url = gen_url + file_name                                       # SEC filing document URL
+    inputfiles = soup.find('inputfiles')
+    htm_doc = inputfiles.find_all("file", attrs={"doctype": form})
+    if len(htm_doc) >0:
+        file_name = (htm_doc[0]).text
+        doc_url = gen_url + file_name                                   # SEC filing document URL
+        parse_method = "htm"
+    else:
+        xml_doc = inputfiles.find_all("file")
+        file_name = (xml_doc[0]).text
+        doc_url = gen_url + file_name                                   # SEC filing document URL
+        parse_method = "xml"
     reports = soup.find('myreports')
     sec_tables = []
     for report in reports.find_all('report')[:-1]:
@@ -138,7 +145,7 @@ def get_doc_url(cik, accn, form):
         sec_table['name'] = report.shortname.text.replace(" ", "_")
         sec_table['url'] = gen_url + report.htmlfilename.text
         sec_tables.append(sec_table)                                    # Appends a map of the name and url of the individual report to the list
-    return (doc_url, sec_tables)
+    return (doc_url, sec_tables, parse_method)
 
 
 ##########################################################################
@@ -206,8 +213,8 @@ def get_text_data(doc_soup):
 ##########################################################################
 """
 get_table_data function takes in the BeautifulSoup parsed htm document of 
-a filing, it's year, form type and spec(special variable) defaulted to 0.
-If spec parameter is used then form and year is of no use in this function.
+a filing, it's year, form type, parse_method and spec(special variable) defaulted
+to 0. If spec parameter is used then form and year is of no use in this function.
 spec parameter is the Reporting date of the filing and if it is extracted 
 successfully in the scrape.py, it is used in the main logic of this function.
 
@@ -225,18 +232,25 @@ It then returns the dictionary with features mapped to their values.
 """
 
 
-def get_table_data(doc_soup, year, form, spec=0):
+def get_table_data(doc_soup, year, form, parse_method, spec=0):
     if form == "10-K":
         year +=1
     table_data = dict()
     for feature in features.keys():
-        try:            
-            value = doc_soup.find_all("ix:nonfraction", {"name": features[feature]})
+        try:      
+            if parse_method=="htm":
+                value = doc_soup.find_all(re.compile("ix:nonfraction", re.I), {"name": re.compile(f"{features[feature]}", re.I)})
+            else:
+                value = doc_soup.find_all(re.compile(f"{features[feature]}", re.I))
             values = []
-            for i in value:               
+            for i in value:  
+                if i.has_attr("contextref"):
+                    contextref = "contextref"
+                elif i.has_attr("contextRef"):
+                    contextref = "contextRef"     
                 try:
-                    if spec==0:
-                        if str(year) in i["contextref"]:    
+                    if spec==0:                        
+                        if str(year) in i[contextref]:    
                             if i.has_attr("sign"):                                              # It checks if sign attribute exists or not
                                 if i.has_attr("scale"):                                         # If exists it checks for scale attribute
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -247,7 +261,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                     values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
                                 else:
                                     values.append(float(i.text.replace(",","")))
-                        elif str(year-1) in i["contextref"]: 
+                        elif str(year-1) in i[contextref]: 
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -258,7 +272,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                     values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
                                 else:
                                     values.append(float(i.text.replace(",","")))
-                        elif str(year+1) in i["contextref"]: 
+                        elif str(year+1) in i[contextref]: 
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -270,7 +284,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                 else:
                                     values.append(float(+i.text.replace(",","")))
                     else:
-                        if spec.replace("-","") in i["contextref"].replace("-",""):             # It removes - from both spec and contextref and checks if spec is in contextref
+                        if spec.replace("-","") in i[contextref].replace("-",""):             # It removes - from both spec and contextref and checks if spec is in contextref
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -281,7 +295,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                     values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
                                 else:
                                     values.append(float(i.text.replace(",","")))
-                        elif str(year) in i["contextref"]:    
+                        elif str(year) in i[contextref]:    
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -292,7 +306,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                     values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
                                 else:
                                     values.append(float(i.text.replace(",","")))
-                        elif str(year-1) in i["contextref"]: 
+                        elif str(year-1) in i[contextref]: 
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -303,7 +317,7 @@ def get_table_data(doc_soup, year, form, spec=0):
                                     values.append(float(i.text.replace(",","")+"0"*int(i["scale"])))
                                 else:
                                     values.append(float(i.text.replace(",","")))
-                        elif str(year+1) in i["contextref"]: 
+                        elif str(year+1) in i[contextref]: 
                             if i.has_attr("sign"):
                                 if i.has_attr("scale"):
                                     values.append(float(i["sign"]+i.text.replace(",","")+"0"*int(i["scale"])))
@@ -317,7 +331,10 @@ def get_table_data(doc_soup, year, form, spec=0):
                 except:
                     continue
             if len(values)!=0:
-                table_data[feature] = table_data.get( feature , max(values))
+                if max(values)<0:
+                    table_data[feature] = table_data.get( feature , min(values))
+                else:
+                    table_data[feature] = table_data.get( feature , max(values))
             else:                                                       # If any value is not found
                 table_data[feature] = table_data.get(feature, "NaN")    # it sets a NaN value for it
         except:
