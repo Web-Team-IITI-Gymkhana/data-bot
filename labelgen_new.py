@@ -11,13 +11,13 @@ import sys
 import pandas as pd
 import json
 
-#below functions are designed to generate labels or categories Profitablity ratios and 
+#below functions are designed to generate labels or categories for Profitablity ratios and 
 # metrics on the basis of investability 
 #Ideal Ranges of each ratios and metrics are taken on the basis of theoretical / technical 
 #perspective generally used by investors
 # labels generated in form of 0 or 1 or Nan: where 
       # 0 denotes bad Metrics or Ratio value for investment
-      # 1 denotes goog ratio value for investment
+      # 1 denotes good ratio value for investment
       # Nan denotes data insufficency that is data not published by company
 
 ##Functions

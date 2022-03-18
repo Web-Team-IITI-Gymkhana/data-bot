@@ -9,17 +9,19 @@ f = open('json/data_10k_table(dummy).json')
 
  
 data = json.load(f)
-
-#below functions are designed to generate labels or categories Profitablity ratios and 
-# metrics on the basis of investability.
-#Ideal Ranges of each ratios and metrics are considered on the basis of theoretical / technical 
-#perspective generally used by investors.
-## Checkout Functions of Financial Ratios / Metrics and their Respective Ideal Range.
+ 
+#Below functions are designed to generate labels or categories, 
+# Profitability ratios and metrics on the basis of investability.
+#Ideal Ranges of each ratios and metrics are considered on the basis of theoretical or 
+# technical and market perspective generally used by investors.
+# You can take a look at the below functions of Financial Ratios / Metrics and
+#  their Respective Ideal Range.
 # labels generated in form of 0 or 1 or Nan: where 
       # 0 denotes bad Metrics or Ratio value for investment
-      # 1 denotes goog ratio value for investment
-      # Nan denotes data insufficency that is data not published by company
-      
+      # 1 denotes good ratio value for investment
+      # Nan denotes data insufficiency where data is not publicly-
+        # -released by company in their SEC filings/
+
 ##Functions
 #1. Working Capital ratios  1.5=<r<=2
 def wce(r):  
@@ -131,6 +133,13 @@ def chun_rate(r):
 
 "=============================================="
 '''
+**Disclaimer**
+>> MRR and ARR isn't publicly released by most of the companies in their SEC fillings. 
+So, we are working on the assumption that most of the SaaS companies 
+follow a subscription based model. 
+>>Hence, our assumption to replace ARR and MRR with Net Revenues has
+ grounds for standing.
+----------------------------------------------------------------------------
 Working Capital Ratio	= Total Current Assets / Total Current Liabilities 
 Earning Per Share	= Profit ( or Income ) / Ang common outstanding shares 
 Debt to Equity Ratio	= Total Liabilities / Total Shareholders' (or Stockholders') equity 
@@ -245,7 +254,7 @@ for cik in data:
         'MarketCap':MarketCap,
         'MagicNumber':MagicNumber,       
       }
-      #Creating DataFrame or Arranging Companies Data and Ratios Together as Tabular Form
+      #Creating DataFrame to arrange companies' data and ratios together in a tabular form
       rato= pd.DataFrame(ratios.items())
       rato, rato.columns= rato.T, ratios.keys()
       rato.drop(index=rato.index[0],axis=0, inplace=True)
@@ -255,9 +264,10 @@ for cik in data:
       #To View Label Functions and Ideal Range used by Market Investors can 
       # refer to above codes 
       # labels generated in form of 0 or 1 or Nan: where 
-      # 0 denotes bad Metrics or Ratio value for investment
-      # 1 denotes goog ratio value for investment
-      # Nan denotes data insufficency that is data not published by company
+      # 0 denotes bad Metrics or Ratio value for investment.
+      # 1 denotes good ratio value for investment.
+      # Nan denotes data insufficiency where data is not--
+      # --publicly released by company in their SEC filings.
       rato['wce_label']=rato['WorkingCapitalRatio'].apply(wce)
       rato['eps_label']=rato['EarningPerShare'].apply(eps)
       rato['de_label']=rato['DebtToEquityRatio'].apply(de)
