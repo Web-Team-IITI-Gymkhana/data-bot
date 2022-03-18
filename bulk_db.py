@@ -3,23 +3,49 @@ from firebase_admin import credentials, firestore
 import json
 import pandas as pd
 import scrape
-import time
 
-start_time = time.time()
+
+##########################################################################
+"""
+It reads the CIK of all the Good Marked Companies from the GoodCom.csv and
+creates a list of the ciks.
+"""
 
 df = pd.read_csv('./csv/GoodCom.csv', index_col="CIK")
 ciks = df.index.tolist()
+
+
+##########################################################################
+"""
+Initiating Firebase and Firestore for database
+"""
 
 token = "sass-db-firebase-adminsdk-4gh5l-4b1dd3dc87.json"
 cred = credentials.Certificate(token)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+
+##################################################################################################################################################
+"""
+It reads 8K_Text_Sentiment.json, loads it as a dictionary. 
+bulk() function iterates through the list of ciks and get all the data from
+get_data function of scrape.py and writes into the database according to the
+following structure:
+
+company(collection)-->cik(document)-->meta_data(fields)
+                                   -->_10k(sub-collection) -->FilingDocuments --> (DocURL, FilingDate, FilingForDate, features, sec_filing)
+                                   -->_10q(sub-collection) -->FilingDocuments --> (DocURL, FilingDate, FilingForDate, features, sec_filing)
+                                   -->_8k(sub-collection)  -->Year --> (Cluster Fields)
+
+"""
+
+
 with open('8K_Text_Sentiment.json', 'r') as f:
         data_8k = json.load(f)
 
 def bulk():
-    for cik in ciks[2:10]:
+    for cik in ciks[20:30]:
         data = scrape.get_data(cik)
         _10k = data.pop("_10k")
         _10q = data.pop("_10q")
@@ -42,4 +68,5 @@ def bulk():
 
 bulk()
 
-print(f"It took : {time.time()-start_time} seconds")
+
+#########################################################################

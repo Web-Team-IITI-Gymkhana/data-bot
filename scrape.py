@@ -2,6 +2,18 @@ import scrape_utils
 from bs4 import BeautifulSoup
 import urllib3
 from dateutil import parser
+import re
+
+
+##########################################################################
+"""
+This is the header which needs to be passed to the SEC EDGAR website for
+retrival of data, documentation can be found on 
+https://www.sec.gov/os/webmaster-faq#developers 
+
+The http variable creates a urllib3 PoolManager to efficiently run all the requests
+"""
+
 
 http = urllib3.PoolManager()
 
@@ -9,6 +21,29 @@ headers = {
     'user-agent': 'Sample @ <sample@sample.com>',
     'host': 'www.sec.gov'
 }
+
+
+##########################################################################
+"""
+get_data function takes in the CIK of a company.
+It calls the functions defined in the scrape_utils file.
+Firstly it calls the get_meta_stock function and passes the CIK of the 
+company, then for each form type in each year it calls the 
+get_accn function, with that it gets accession number and date of
+filings. Then for each accession number it calls the get_doc_url
+function to get the Filing Document URL and Individual Reports.
+It then uses Beautiful Soup to parse the HTM document and finds in
+Filing for Date in the document. If it finds it tries to parse the 
+date in YYYY-MM-DD format and then sends it in the get_table_data
+as the spec parameter. If the parsing is not successful it saves the 
+unparsed date or if the date is not found get_table_data is called
+without spec parameter. It then calls the get_text_data function. 
+If the Stock price is not found in the filing report and stock_prices
+is returned by the get_meta_stock function, it finds the stock price 
+through that data. It then binds the complete data and returns it in the 
+{"form-type":{"year":{data}}}
+"""
+
 
 def get_data(cik):
     meta_data, stock_prices = scrape_utils.get_meta_stock(cik)
@@ -49,7 +84,13 @@ def get_data(cik):
                             text_data = scrape_utils.get_text_data(doc_soup)
 
                             if table_data['StockPrice'] == "NaN" and bool(stock_prices):
-                                if form == "10-K":
+                                if bool(re.match('[\d/-]', complete_data["FilingForDate"])):
+                                    check_list = complete_data["FilingForDate"].split("-")
+                                    for stock_date in stock_prices.keys():
+                                        stock_date_split = stock_date.split("-")
+                                        if check_list[0] == stock_date_split[0] and check_list[1] == stock_date_split[1]:
+                                            table_data['StockPrice'] = float(stock_prices[stock_date]['4. close'])             
+                                elif form == "10-K":
                                     for stock_date in stock_prices.keys():
                                         try:
                                             if stock_date.split("-")[1] == '01' and stock_date.split("-")[0] == str(year+1):
@@ -89,6 +130,5 @@ def get_data(cik):
     companies_data = {**meta_data, **form_data}
     return companies_data
 
-# import json
-# with open("trynew3.json", "w") as f:
-#     json.dump(get_data(796343), f, indent=4)
+
+##########################################################################
