@@ -44,11 +44,11 @@ company(collection)-->cik(document)-->meta_data(fields)
 """
 
 
-with open('8K_Text_Sentiment_Date.json', 'r') as f:
+with open('./json/8K_Text_Sentiment_Date.json', 'r') as f:
         data_8k = json.load(f)
 
 def bulk():
-    for cik in ciks[145:150]:
+    for cik in ciks:
         data = scrape.get_data(cik)
         _10k = data.pop("_10k")
         _10q = data.pop("_10q")
