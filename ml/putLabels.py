@@ -262,7 +262,6 @@ for cik in data:
       rato= pd.DataFrame(ratios.items())
       rato, rato.columns= rato.T, ratios.keys()
       rato.drop(index=rato.index[0],axis=0, inplace=True)
-      #print(rato)
       rato['wce_label']=rato['WorkingCapitalRatio'].apply(wce)
       rato['eps_label']=rato['EarningPerShare'].apply(eps)
       rato['de_label']=rato['DebtToEquityRatio'].apply(de)
