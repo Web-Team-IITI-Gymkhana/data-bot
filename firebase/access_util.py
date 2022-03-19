@@ -118,7 +118,10 @@ class ratios:
   def setup_ratios(cur, prev):
       for keys in cur:
         try:
-          cur[keys] = np.float64(cur[keys])
+          if cur[keys]== 0:
+            cur[keys] = np.float64("nan")
+          else:
+            cur[keys] = np.float64(cur[keys])+ 1e-20
         except:
           try:
             if isnan(cur[keys])== True:
@@ -128,7 +131,10 @@ class ratios:
       
       for keys in prev:
         try:
-          prev[keys] = np.float64(prev[keys])
+          if prev[keys]== 0:
+            prev[keys] = np.float64("nan")
+          else:
+            prev[keys] = np.float64(prev[keys])
         except:
           try:
             if isnan(prev[keys])== True:
