@@ -23,6 +23,8 @@ db = firestore.client()
 # import ml model xgboost
 model = pickle.load(open('xgbmodel.pkl', 'rb'))
 
+xgb_regressor = pickle.load(open('./ml/xgbmodel_regression_75.pkl','rb'))
+
 #########################################################################
 """
 It reads 8K_Text_Sentiment.json, loads it as a dictionary. 
@@ -113,6 +115,25 @@ def xgboost_clf():
     xgb_predictions = model.predict(X)
     print(xgb_predictions)
     return str(xgb_predictions)
+
+@app.route('/xgboost_regressor', methods=['GET', 'POST'])
+def xgboost_regression():
+    data = request.json
+    cur = data['cur']
+    prev = data['prev']
+    rt = ratios()
+    ratio, rato = rt.setup_ratios(cur, prev)
+    print(rato)
+    labels = rato
+    avg_labels = labels.mean(axis = 0, skipna = True).fillna(0).to_dict()
+    for key in labels.keys():
+        labels[key] = labels[key].fillna(avg_labels[key])
+    X = labels[['GrossProfit','GrossMargin','WorkingCapitalRatio','EarningPerShare','DebtToEquityRatio','PEratio','ReturnOfEquity','EBIDTAratio','EvRatio','EVbyEbidta','ChurnRate','GrowthRate','ProfitMargin','RuleOf40','MarketCap','MagicNumber']]
+    print(X)
+    xgb_predictions = model.predict(X)
+    print(xgb_predictions)
+    return str(xgb_predictions)
+
 
 #########################################################################
 if __name__ == '__main__':
