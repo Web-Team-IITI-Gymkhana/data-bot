@@ -67,7 +67,7 @@ def get_data(cik, type, datea, dateb):
 
 ##########################################################################
 """
-It checks for all companies in company_dict, if the number of filing
+It checks for all companies in company_dict, if the number of 10-K filing
 between 2020-01-01 to 2022-03-03 is zero it classify it as a bad
 company else as a good company. It then writes two csv files GoodCom.csv
 and BadCom.csv with the sorted company details.
