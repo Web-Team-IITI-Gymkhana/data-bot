@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import urllib3
 import requests
 import xml.etree.ElementTree as ET
+import re
+from dateutil import parser
 
 
 sentiment_features = ('$','%','unit','ten','hundred','thousand','million','billion','revenue','loss','profit',
@@ -20,7 +22,7 @@ text that may provide a significant amount of financial information about the co
 '''
 
 def get_scrape_text(cik, form, datea, dateb):
-    final_sentences = [] #stores the final list of extracted sentences
+    final_sentences = []
 
     endpoint = "https://www.sec.gov/cgi-bin/browse-edgar" #url of endpoint for performing the search
     base_url = "https://www.sec.gov/Archives/edgar/data/"
@@ -46,11 +48,30 @@ def get_scrape_text(cik, form, datea, dateb):
             content = requests.get(xml_summary, headers=headers).content  
             soup = BeautifulSoup(content, features='lxml')
             reports = soup.find('inputfiles')
+            
+            htm_doc = reports.find_all("file", attrs={"doctype": form})
+            if len(htm_doc)>0:
+                parse_method = "htm"
+            else:
+                parse_method = "xml"
+
             file_name = (reports.find_all("file", attrs={"doctype": form})[0]).text
             doc_url = gen_url + file_name  # SEC filing document URL
             http = urllib3.PoolManager()
             req = http.request("GET",doc_url,headers=headers)
             docsoup = BeautifulSoup(req.data, features='lxml')
+
+            if parse_method=="htm":
+                filing_for_date_tag = docsoup.find_all("ix:nonnumeric", {"name": "dei:DocumentPeriodEndDate"})
+            else:
+                filing_for_date_tag = docsoup.find_all(re.compile("dei:DocumentPeriodEndDate", re.I))
+            if len(filing_for_date_tag)>0:
+                try:
+                    date_text = filing_for_date_tag[0].text.replace("&nbsp;", " ")
+                    date_text = parser.parse(date_text).strftime('%Y-%m-%d')
+                    # print(date_text)
+                except Exception as e:
+                    print("Date error ",e)
 
             text_tags = docsoup.find_all(["span", "p","font","li"]) #Extract all the tags which contain text in the form
             anchor_tags = docsoup.find_all(["a"]) #This is used to extract the link of a press release issued by the company
@@ -78,7 +99,7 @@ def get_scrape_text(cik, form, datea, dateb):
                     if valid==True: 
                         txt = txt.encode("utf-8")
                         txt = txt.decode("utf-8","ignore")
-                        final_sentences.append(txt)
+                        final_sentences.append({'sentence':txt,'date':date_text})
                         # print(txt)
                 except Exception as e:
                     continue
@@ -119,7 +140,7 @@ def get_scrape_text(cik, form, datea, dateb):
                             if valid==True:
                                 txt = txt.encode("utf-8")
                                 txt = txt.decode("utf-8","ignore")
-                                final_sentences.append(txt)
+                                final_sentences.append({'sentence':txt,'date':date_text})
                                 # print(txt)
                 except Exception as e:
                     continue
