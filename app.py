@@ -6,7 +6,7 @@ from scrape_utils import get_meta_stock
 import json
 import pandas as pd
 import pickle
-from put_labels_2 import ratios
+from put_labels import ratios
 
 #########################################################################
 """
