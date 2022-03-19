@@ -23,7 +23,7 @@ db = firestore.client()
 # import ml model xgboost
 model = pickle.load(open('xgbmodel.pkl', 'rb'))
 
-xgb_regressor = pickle.load(open('./ml/xgbmodel_regression_75.pkl','rb'))
+xgb_regressor = pickle.load(open('./ml/xgbmodel_regression_150.pkl','rb'))
 
 #########################################################################
 """
