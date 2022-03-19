@@ -21,9 +21,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # import ml model xgboost
-model = pickle.load(open('xgbmodel.pkl', 'rb'))
-
-xgb_regressor = pickle.load(open('./ml/xgbmodel_regression_150.pkl','rb'))
+xgb_regressor = pickle.load(open('./ml/xgbmodel_regression.pkl','rb'))
 
 #########################################################################
 """
@@ -93,29 +91,6 @@ def islist(obj):
 
 # This function will run a saved pickle model on provided data
 # post json of data: {cur: {}, prev: {}} like json/app_test.json
-@app.route('/xgboost', methods=['GET', 'POST'])
-def xgboost_clf():
-    data = request.json
-    cur = data['cur']
-    prev = data['prev']
-    rt = ratios()
-    ratio, rato = rt.setup_ratios(cur, prev)
-    print(rato)
-    labels = rato
-    labels['aggregate'] = labels[['wce_label','eps_label','de_label','pe_label','roe_label','growth_rate_label','profitm_label','grossm_label','ro40_label','churnrate_label','EVbyEbidta_label','marketCap_label','magicNum_label']].sum(axis = 1, skipna = True)
-    avg_labels = labels.mean(axis = 0, skipna = True).fillna(0).to_dict()
-    for key in labels.keys():
-        labels[key] = labels[key].fillna(avg_labels[key])
-    labels['aggregate'] = labels['aggregate'].astype(int)
-    X = labels[['GrossProfit','GrossMargin','WorkingCapitalRatio','EarningPerShare','DebtToEquityRatio','PEratio','ReturnOfEquity','EBIDTAratio','EvRatio','EVbyEbidta','ChurnRate','GrowthRate','ProfitMargin','RuleOf40','MarketCap','MagicNumber']]
-    y = labels['aggregate']
-    print(X)
-    labels.to_csv("labels.csv", index = False) 
-    print(y)
-    xgb_predictions = model.predict(X)
-    print(xgb_predictions)
-    return str(xgb_predictions)
-
 @app.route('/xgboost_regressor', methods=['GET', 'POST'])
 def xgboost_regression():
     data = request.json
