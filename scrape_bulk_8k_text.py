@@ -1,3 +1,4 @@
+from numpy import take
 import pandas as pd
 import scrape_8k_text
 import json
@@ -8,7 +9,17 @@ companies = pd.read_csv("./csv/GoodCom.csv")
 ciks = companies["CIK"].astype(int).tolist() #Get the list of all ciks
 
 
-json_file_name = "bulk_8k_data.json"
+json_file_name = "8k_text_data_mihir_1.json" #name of json file obtained from bulk scraping
+lb = 0 #start of range
+ub = 50 #end of range
+
+json_file_name = "8k_text_data_mihir_2.json" #name of json file obtained from bulk scraping
+lb =  50#start of range
+ub = 130 #end of range
+
+json_file_name = "8k_text_data_mihir_3.json" #name of json file obtained from bulk scraping
+lb =  130#start of range
+ub = -1 #end of range
 
 years = [2022, 2021]
 
@@ -20,22 +31,25 @@ def mustHave(sentence):
 
 data_8k_text = dict()
 
-for cik in ciks:
+for cik in ciks[lb:]:
     year_dict = dict()
     
     for year in years:
         try:
-            paragraph = ""
             sentences = scrape_8k_text.get_scrape_text(cik, "8-K", f"{year-1}0101", f"{year}0101")
             chosen = []
-            for sentence in sentences:
+            taken = []
+            for sentence_object in sentences:
+                sentence = sentence_object['sentence']
+                if sentence.lower() in taken:
+                    continue
+                taken.append(sentence.lower())
                 result = TextBlob(sentence).sentiment 
                 subjectivity = result.subjectivity #We find the subjectivity of the sentnce
                 if subjectivity>=0.4 and mustHave(sentence): #If the subjectivity of the sentence is above a certain threshold, we append it to the list of final sentences
                     sentence = sentence.capitalize()
-                    chosen.append(sentence)
+                    chosen.append({'sentence':sentence,'date':sentence_object['date']})
             
-            chosen = list(set(chosen))
             year_dict[f"{year-1}" + " Sentences"] = chosen
         except Exception as e:
             print(e)
