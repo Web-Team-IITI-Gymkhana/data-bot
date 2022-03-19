@@ -2,100 +2,49 @@ import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 import access_util as au
+import pandas as pd
 epsilon = 1e-20
 
-cred = credentials.Certificate('../serviceAccount.json')
+cred = credentials.Certificate('../sass-db-firebase-adminsdk-4gh5l-4b1dd3dc87.json')
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# all collections
-# for doc in db.collections():
-#     print(u'{}'.format(doc.id))
-
-myCollection = db.collection("company")
-company_list = []
-for doc in myCollection.stream():
-    company_list.append(doc.id)
+companies = pd.read_csv("../csv/GoodCom.csv")
+ciks = companies["CIK"].astype(int).tolist()
     # print(u'{} => {}'.format(doc.id, doc.to_dict()))
-    
-print("company_list cik numbers:")
-print(company_list)
 
-# all documents.collections
-count_to_display = 3
-for cik in company_list:
-    if count_to_display == 0: break
-    for date in ("2021", "2020"):
-        x = myCollection.document(cik).collection("10k").document(date).get()
-        
-        cur = x.to_dict()
-        keys = x.to_dict().keys()
-        print(f"{cik} + {date} has MarketableSecurities: {cur['MarketableSecurities']}")
-        prevDate = int(date) - 1
-        try:
-            y = myCollection.document(cik).collection("10k").document(prevDate).get()
-        except:
-            y = x
-        prev = y.to_dict()
+netcsv = []
+netvalues = []
 
-        data = {
-            "CashAndCashEquivalents": 2240303000.0,
-            "MarketableSecurities": 2004410000.0,
-            "TotalCurrentAssets": 4792865000.0,
-            "TotalAssets": 4792865000.0,
-            "PropertyAndEquipmentNet": 149924000.0,
-            "Goodwill": 24340000.0,
-            "TotalCurrentLiabilities": 1259966000.0,
-            "SharesOutstanding": 293714045,
-            "CommonStock": 292000.0,
-            "TotalStockholdersEquity": 3860767000.0,
-            "TotalEquity": 3860767000.0,
-            "GrossProfit": 1829379000.0,
-            "TotalOperatingExpenses": 1169531000.0,
-            "NetIncome": 671527000,
-            "GrossPropertyAndEquipment": 201879000.0,
-            "NetLoss": 341487000.0,
-            "Inventories": 0,
-            "StockPrice": 396	,
-            "TotalCostsAndExpenses": 685000000,
-            "SalesCost": 700000000,
-            "MarketingCost": 700000000,
-            "SubscriptionRevenue": 326000000,
-            "TotalDebt": 198000000,
-            "CustomerAcquisitionCosts": "NaN",
-            "CustomerChurn": "NaN",
-            "RevenueChurn": "NaN",
-            "Revenues": 3911000000,
-            "MRR": 326000000,
-            "TotalPropertyAndEquipment": "NaN",
-            "NetOperatingExpenses": 1992000000,
-            "CostOfSales": 700000000,
-            "SubscriberChurn": "NaN",
-            "GAAPRevenue": 287598299	,
-            "EBITDA": 793000000,
-            "Non-GAAPEarnings": 983000000,
-            "RecurringRevenue": "NaN",
-            "OperatingIncome": 1068000000,
-        }
+for cik in ciks[0:75]:
+    try:
+        docs = db.collection("company").document(str(cik)).collection("_10k").stream()
+        docs_dict = dict()
+        for doc in docs:
+            docs_dict[doc.id] = doc.to_dict()["features"]
+        for doc_id in docs_dict.keys():
+            date = doc_id.split("-")[0]
+            prevdate = int(date) - 1
+            cur = docs_dict[doc_id]
+            keys = cur.keys()
+            flag = False
+            for checkdoc in docs_dict.keys():
+                if str(prevdate) in checkdoc and not flag:
+                    prev = docs_dict[checkdoc]
+                    flag = True
+            if not flag:
+                prev = cur
+            rf = au.ratios
+            ratios, rato = rf.setup_ratios(cur, prev)
+            
+            rato.insert(0,"cik_date",f"{cik}_{date}")
+            rato = rato.set_index("cik_date")
+            netcsv.append(rato)
 
-        for key in data.keys():
-            if (key not in cur) :
-                cur[key] = epsilon
-            if (key not in prev) :
-                prev[key] = epsilon
+    except: continue
 
-        # use cur and prev to get ratios and label company
-        rf = au.ratios
-        # print(cur, prev)
-        rf.setup_ratios(cur, prev)
-
-    count_to_display -= 1
-
-print(keys)
-
-
-
-
+result = pd.concat(netcsv)
+result.to_csv("labels2.csv", index = True) 
 
 '''
 parameters in firebase
