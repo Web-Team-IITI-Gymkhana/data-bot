@@ -16,7 +16,7 @@ ciks = companies["CIK"].astype(int).tolist()
 netcsv = []
 netvalues = []
 
-for cik in ciks[0:75]:
+for cik in ciks:
     try:
         docs = db.collection("company").document(str(cik)).collection("_10k").stream()
         docs_dict = dict()
@@ -44,7 +44,7 @@ for cik in ciks[0:75]:
     except: continue
 
 result = pd.concat(netcsv)
-result.to_csv("labels2.csv", index = True) 
+result.to_csv("labelsfinal.csv", index = True) 
 
 '''
 parameters in firebase
