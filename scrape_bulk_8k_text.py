@@ -11,7 +11,15 @@ ciks = companies["CIK"].astype(int).tolist() #Get the list of all ciks
 
 json_file_name = "8k_text_data_mihir_1.json" #name of json file obtained from bulk scraping
 lb = 0 #start of range
-ub = 3 #end of range
+ub = 50 #end of range
+
+json_file_name = "8k_text_data_mihir_2.json" #name of json file obtained from bulk scraping
+lb =  50#start of range
+ub = 130 #end of range
+
+json_file_name = "8k_text_data_mihir_3.json" #name of json file obtained from bulk scraping
+lb =  130#start of range
+ub = -1 #end of range
 
 years = [2022, 2021]
 
@@ -23,7 +31,7 @@ def mustHave(sentence):
 
 data_8k_text = dict()
 
-for cik in ciks[lb:ub]:
+for cik in ciks[lb:]:
     year_dict = dict()
     
     for year in years:
